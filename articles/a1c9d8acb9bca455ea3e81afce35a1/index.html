@@ -1,0 +1,476 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+    <title>T00ls自动签到脚本 | W000i</title>
+    <meta name="author" content="W00i" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <link rel="icon" href="/images/avatar.jpg" />
+    <link rel="preconnect" href="https://s4.zstatic.net" />
+<script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.cn" />
+<link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin />
+<link
+    rel="stylesheet"
+    href="https://fonts.googleapis.cn/css2?family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap"
+/>
+<script> const mixins = {}; </script>
+
+<script src="https://polyfill.alicdn.com/v3/polyfill.min.js?features=default"></script>
+
+
+<script src="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://s4.zstatic.net/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<link
+    rel="stylesheet"
+    href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+/>
+<script src="/js/lib/highlight.js"></script>
+
+
+
+<script src="/js/lib/preview.js"></script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css" />
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+<body>
+    <div id="layout">
+        <transition name="fade">
+            <div id="loading" v-show="loading">
+                <div id="loading-circle">
+                    <h2>LOADING</h2>
+                    <p>加载过慢请开启缓存 浏览器默认开启</p>
+                    <img src="/images/loading.gif" />
+                </div>
+            </div>
+        </transition>
+        <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
+    <nav id="desktop-menu">
+        <a class="title" href="/">
+            <span>W000I</span>
+        </a>
+        
+        <a href="/">
+            <i class="fa-solid fa-house fa-fw"></i>
+            <span>&ensp;主页</span>
+        </a>
+        
+    </nav>
+    <nav id="mobile-menu">
+        <div class="title" @click="showMenuItems = !showMenuItems">
+            <i class="fa-solid fa-bars fa-fw"></i>
+            <span>&emsp;W000I</span>
+        </div>
+        <transition name="slide">
+            <div class="items" v-show="showMenuItems">
+                
+                <a href="/">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-house fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">主页</div>
+                    </div>
+                </a>
+                
+            </div>
+        </transition>
+    </nav>
+</div>
+<transition name="fade">
+    <div id="menu-curtain" @click="showMenuItems = !showMenuItems" v-show="showMenuItems"></div>
+</transition>
+
+        <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
+            <div class="article">
+    <div>
+        <h1>T00ls自动签到脚本</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/8/19
+        </span>
+        
+        
+        <span class="tags">
+            <span class="icon">
+                <i class="fa-solid fa-tags fa-fw"></i>
+            </span>
+            
+            
+            <span class="tag">
+                
+                <a href="/tags/Python/" style="color: #03a9f4">
+                    Python
+                </a>
+            </span>
+            
+        </span>
+        
+    </div>
+    
+    <div class="content" v-pre>
+        <p>T00ls论坛每天签到和查询域名会给tubi，有时候经常忘记，找了其他人的脚本发现查询域名有问题，简单改了一下。</p>
+<p>tips：最近查询域名网站更新，需要改一下获取域名和代码才可以用。</p>
+<span id="more"></span>
+
+<h2 id="钉钉接入"><a href="#钉钉接入" class="headerlink" title="钉钉接入"></a>钉钉接入</h2><p>在群组添加一个自定义的机器人</p>
+<p><img src="/../imgs/T00ls%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%E8%84%9A%E6%9C%AC/image-1681724211344-17241350145542.png" alt="image-1681724211344"></p>
+<p>需要开启自定义关键字，调用接口发送的内容包含关键字才会发出通知</p>
+<p><img src="/../imgs/T00ls%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%E8%84%9A%E6%9C%AC/image-1681724244374.png" alt="image-1681724244374"></p>
+<p>添加成功后复制Webhook</p>
+<p><img src="/../imgs/T00ls%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%E8%84%9A%E6%9C%AC/image-1681724335886.png" alt="image-1681724335886"></p>
+<p>使用下方代码替换webhook_url为你的Webhook，测试机器人是否可用</p>
+<pre><code class="Python">import json
+import requests
+
+webhook_url = ” Your Webhook“
+dd_headers = &#123;
+    &quot;Content-Type&quot;: &quot;application/json&quot;,
+    &quot;Charset&quot;: &quot;UTF-8&quot;
+&#125;
+dd_message = &#123;
+    &quot;msgtype&quot;: &quot;text&quot;,
+    &quot;text&quot;: &#123;
+        &quot;content&quot;: f&#39;T00ls 签到通知\n&#39;
+    &#125;
+&#125;
+requests.post(url=webhook_url, headers=dd_headers, data=json.dumps(dd_message))
+</code></pre>
+<p><img src="/../imgs/T00ls%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%E8%84%9A%E6%9C%AC/image-1681724720698.png" alt="image-1681724720698"></p>
+<h2 id="打码平台"><a href="#打码平台" class="headerlink" title="打码平台"></a>打码平台</h2><p>由于采用了cf-turnstile验证方式，需要找支持turnstile的打码平台<br><img src="/../imgs/T00ls%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%E8%84%9A%E6%9C%AC/image-1681724859498.png" alt="image-1681724859498"></p>
+<p>经过搜索后发现一家俄罗斯的供应商支持turnstile认证<br>并且它的价格很实惠，1000次只需要2.99刀<br><img src="/../imgs/T00ls%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%E8%84%9A%E6%9C%AC/image-1681725110049.png" alt="image-1681725110049"></p>
+<p>打开官网<a target="_blank" rel="noopener" href="https://2captcha.com/?from=17547739">2captcha</a><br>注册账号并充值1美刀，可以使用支付宝或者加密货币进行付款<br><img src="/../imgs/T00ls%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%E8%84%9A%E6%9C%AC/image-1681725298311.png" alt="image-1681725298311"></p>
+<p>充值成功后金额会进行刷新<br>下面的key在调用接口时会使用<br><img src="/../imgs/T00ls%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%E8%84%9A%E6%9C%AC/image-1681725437633.png" alt="image-1681725437633"></p>
+<p>安装第三方库<br>pip3 install 2captcha-python</p>
+<h2 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h2><p>第8行到第23行改成自己的参数配置</p>
+<pre><code class="Python">import json
+import re
+import requests
+import time
+import random
+from twocaptcha import TwoCaptcha
+
+username = &#39;Your user&#39;  # 帐号
+password = &#39;Your password&#39;  # 密码MD5 32位(小写)
+question_num = 1  # 安全提问 参考下面
+question_answer = &#39;Your answer&#39;  # 安全提问答案
+key = &#39;Your 2captcha-key&#39;  # 2captcha平台的key值
+# 0 = 没有安全提问
+# 1 = 母亲的名字
+# 2 = 爷爷的名字
+# 3 = 父亲出生的城市
+# 4 = 您其中一位老师的名字
+# 5 = 您个人计算机的型号
+# 6 = 您最喜欢的餐馆名称
+# 7 = 驾驶执照的最后四位数字
+
+#钉钉通知配置信息
+webhook = &#39;Your webhook&#39; # 钉钉机器人的 webhook
+#ua头
+req_headers = &#123;
+    &#39;User-Agent&#39;: &#39;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Safari/537.36&#39;,
+    &#39;Content-Type&#39;: &#39;application/x-www-form-urlencoded&#39;,
+    &#39;Referer&#39;: &#39;https://www.t00ls.com/login.html&#39;
+&#125;
+# 登录
+def t00ls_login(u_name, u_pass, q_num, q_ans):
+    &quot;&quot;&quot;
+    t00ls 登录函数
+    :param u_name: 用户名
+    :param u_pass: 密码的 md5 值 32 位小写
+    :param q_num: 安全提问类型
+    :param q_ans: 安全提问答案
+    :return: 签到要用的 hash 和 登录后的 Cookies
+    &quot;&quot;&quot;
+    login_data = &#123;
+        &#39;action&#39;: &#39;login&#39;,
+        &#39;username&#39;: u_name,
+        &#39;password&#39;: u_pass,
+        &#39;questionid&#39;: q_num,
+        &#39;answer&#39;: q_ans
+    &#125;
+    response_login = requests.post(&#39;https://www.t00ls.com/login.json&#39;, headers=req_headers,data=login_data)
+    response_login_json = json.loads(response_login.text)
+
+    if response_login_json[&#39;status&#39;] != &#39;success&#39;:
+        return None
+    else:
+        print(&#39;用户:&#39;, username, &#39;登入成功!&#39;)
+        formhash = response_login_json[&#39;formhash&#39;]
+        t00ls_cookies = response_login.cookies
+        return formhash, t00ls_cookies
+
+# 签到
+def t00ls_sign(t00ls_hash, t00ls_cookies):
+    &quot;&quot;&quot;
+    t00ls 签到函数
+    :param t00ls_hash: 签到要用的 hash
+    :param t00ls_cookies: 登录后的 Cookies
+    :return: 签到后的 JSON 数据
+    &quot;&quot;&quot;
+    sign_data = &#123;
+        &#39;formhash&#39;: t00ls_hash,
+        &#39;signsubmit&#39;: &quot;true&quot;
+    &#125;
+    response_sign = requests.post(&#39;https://www.t00ls.com/ajax-sign.json&#39;, headers=req_headers,data=sign_data, cookies=t00ls_cookies)
+    return json.loads(response_sign.text)
+
+def domains():
+    # 使用站长之家查询今天注册的域名
+    start_time = time.time()
+    china_url = &#39;https://whois.chinaz.com/suffixapi/list&#39;
+    search_data = &#123;&quot;module&quot;: &quot;suffix&quot;,
+                   &quot;keyword&quot;: &quot;&#123;\&quot;suffix\&quot;:\&quot;.com\&quot;,\&quot;z_suffix\&quot;:\&quot;\&quot;,\&quot;c_suffix\&quot;:\&quot;com,cn\&quot;,\&quot;time\&quot;:\&quot;1\&quot;,\&quot;startDay\&quot;:\&quot;\&quot;,\&quot;endDay\&quot;:\&quot;\&quot;,\&quot;st\&quot;:\&quot;\&quot;,\&quot;cn\&quot;:\&quot;\&quot;,\&quot;city\&quot;:\&quot;\&quot;,\&quot;page\&quot;:1&#125;&quot;,
+                   &quot;params&quot;: &#123;&quot;suffix&quot;: &quot;.com&quot;, &quot;z_suffix&quot;: &quot;&quot;, &quot;c_suffix&quot;: &quot;com,cn&quot;, &quot;time&quot;: &quot;1&quot;, &quot;startDay&quot;: &quot;&quot;,
+                              &quot;endDay&quot;: &quot;&quot;, &quot;st&quot;: &quot;&quot;, &quot;cn&quot;: &quot;&quot;, &quot;city&quot;: &quot;&quot;, &quot;page&quot;: 1&#125;,
+                   &quot;ts&quot;: 1676629730046,
+                   &quot;token&quot;: &quot;14ef910cd0e7943bdcdfd93a14548bf5&quot;&#125;
+    req_search_headers = &#123;
+        &#39;Cookie&#39;: &#39;toolbox_urls=translate.google.cn|google.cn|gyyg.xayjx.top|cdn.xczx.tk; pinghost=cdn1.xczx.tk; cz_statistics_visitor=06b65b23-2478-e8a5-d7f7-e889cd6a297f; Hm_lvt_aecc9715b0f5d5f7f34fba48a3c511d6=1675238221; __bid_n=1860bfaa66f767cbb44207; FPTOKEN=UYyqEvBrG/lnqxbi8JTtoCW6i3fY/P8iEe5eZChEBHuKGaey579lPzlCGBQzsc3SOi5j46Co8XrT08pwf1Q9l9ijPCjZlXI+wv3GWt00ZwjB88e5hP9XSlO6IwFSAUYvKhUiLbRxcG8SnHzmByopIdPZ19qAb6NRVp/4QpW80KElC9YB3HoIUHXfFN+z9uHMzD1jlmVpkRkfHT/sAQBiJbR3V0TldzYpRJOb3dhLkUl0nUU0WGGQikIQEyGFAeqkH3evbcFEc/CColg9vfn3BgkhMDxzAQF20fnEeKn67pad49+AyMgBKibS/KrMWsKqloHj+BOO+4PYS5iKW5Y7XPUiqeysjvCjOQtYKtgnOBMF5iZKa+B2NoJ4+T4uDblOK3UI0qFfeUfmb+rYivDydQ==|o4ADl9YRsdedqb2bh/T3hMU708yijZ5ied4VCErbS0c=|10|ed7dd2baf354d929a7c16a06c8dabb3f; qHistory=Ly93aG9pcy5jaGluYXouY29tL3N1ZmZpeGFwaS9saXN0X1dIT0lT5p+l6K+ifGh0dHA6Ly90cmVuZHMuY2hpbmF6LmNvbS9yYW5rL3RyZW5kLmFzcHhf5pWw5o2u5YaF5Y+CfGh0dHA6Ly90b29sLmNoaW5hei5jb20vdG9vbHMvYmFzZTY0LmFzcHhfQmFzZTY057yW56CB6Kej56CBfGh0dHA6Ly93aG9pcy5jaGluYXouY29tL3N1ZmZpeF/mnIDmlrDms6jlhozln5/lkI3mn6Xor6I=; Hm_lvt_ca96c3507ee04e182fb6d097cb2a1a4c=1675138340,1675656242,1676620134; Hm_lpvt_ca96c3507ee04e182fb6d097cb2a1a4c=1676620246&#39;,
+        &#39;Content-Length&#39;: &#39;376&#39;,
+        &#39;Sec-Ch-Ua&#39;: &#39;&quot;Chromium&quot;;v=&quot;110&quot;, &quot;Not A(Brand&quot;;v=&quot;24&quot;, &quot;Google Chrome&quot;;v=&quot;110&quot;&#39;,
+        &#39;Accept&#39;: &#39;application/json, text/javascript, */*; q=0.01&#39;,
+        &#39;Content-Type&#39;: &#39;application/json&#39;
+    &#125;
+
+    response_domains = requests.post(url=china_url, headers=req_search_headers, data=json.dumps(search_data),
+                                     verify=False, timeout=15)
+    domains = []
+    txt = response_domains.text
+    follower_result1 = re.findall(&#39;&quot;domain&quot;:&quot;(.*?)&quot;,&quot;&#39;, txt)
+    for i in follower_result1:
+        if &#39;.&#39; in i and &#39;*&#39; not in i:
+            domains.append(i)
+
+    end_time = time.time()
+    print(f&#39;站长之家随机找域名耗时: &#123;end_time - start_time:.0f&#125;秒&#39;)
+    content = &#39;&#39;
+    content += f&#39;\n站长之家随机找域名耗时: &#123;end_time - start_time:.0f&#125;秒\n\n&#39;
+    return content,domains
+
+def t00ls_domain(t00ls_hash, t00ls_cookies,content,domains):
+    &quot;&quot;&quot;
+    t00ls 域名查询函数
+    :param t00ls_hash: 签到要用的 hash
+    :param t00ls_cookies: 登录后的 Cookies
+    :return: 查询相关的日志信息
+    &quot;&quot;&quot;
+
+    #查询域名
+    start_time = time.time()
+    query_url = &#39;https://www.t00ls.com/domain.html&#39;
+    query_status = False
+    query_count = 1  # 查询重试次数
+    turnstile = 1
+    # 如果 t00ls 查询没有成功的话 就一直查询
+    while not query_status and query_count &lt; 4 and turnstile &lt; 16:
+        domain = random.sample(domains, 1)[0]  # 随机抽取一个 幸运儿
+        try:
+            turnstile += 1
+            solver = TwoCaptcha(key)
+            result = solver.turnstile(sitekey=&#39;0x4AAAAAAADUcE7ghOzWNmEe&#39;,url=&#39;https://www.t00ls.com/domain.html&#39;)
+            if result[&#39;code&#39;]:
+                ocr = result[&quot;code&quot;]
+                content += &#39;验证码验证成功\n&#39;
+                print(&#39;验证码验证成功:&#39;+ocr)
+            else:
+                # content += &#39;验证码验证失败\n\n&#39;
+                print(&#39;验证码验证失败&#39; )
+                # content += f&#39;继续第 &#123;turnstile&#125; 次验证\n&#39;
+                print(f&#39;继续第 &#123;turnstile&#125; 次验证\n&#39;)
+                continue
+        except Exception:
+            print(&#39;验证码验证出现错误了&#39;)
+            print(f&#39;继续第 &#123;turnstile&#125; 次验证\n&#39;)
+            # content += &#39;验证码验证出现错误了 \n\n&#39;
+            # content += f&#39;继续第 &#123;turnstile&#125; 次验证\n&#39;
+            if turnstile&gt;=16:
+                content += &#39;验证码验证失败了\n\n&#39;
+            continue
+
+        try:
+            #查询
+            turnstile = 1
+            print(&quot;开始查询&quot;)
+            # proxyies = &#123;&#39;http&#39;: &#39;http://127.0.0.1:8080&#39;&#125;
+
+            query_data = f&#39;domain=&#123;domain&#125;&amp;formhash=&#123;t00ls_hash&#125;&amp;querydomainsubmit=%E6%9F%A5%E8%AF%A2&amp;cf-turnstile-response=&#123;ocr&#125;&#39;
+            response_query = requests.post(url=query_url, headers=req_headers, data=query_data, cookies=t00ls_cookies)
+        except Exception:
+            query_count += 1
+            content += f&#39;域名查询报错：&#123;domain&#125;\n\n&#39;
+            print(f&#39;域名查询错误：&#123;domain&#125;\n&#39;)
+            response_tb = requests.get(&#39;https://www.t00ls.com/members-tubilog.json&#39;, headers=req_headers,
+                                       cookies=t00ls_cookies, timeout=15)
+            if domain in response_tb.text:
+                print(&#39;查询域名成功 TuBi + 1&#39;)
+                content += &#39;查询域名成功 TuBi + 1\n\n&#39;
+                # query_status = True
+                break
+
+            if query_count == 4:
+                print(&#39;重试查询次数已达上限 终止查询&#39;)
+                content += &#39;重试查询次数已达上限 终止查询\n\n&#39;
+                break
+            else:
+                print(f&#39;随机延时 500- 1000秒，继续第 &#123;query_count&#125; 次查询&#39;)
+                content += f&#39;随机延时 500-1000 秒，继续第 &#123;query_count&#125; 次查询\n&#39;
+                time.sleep(random.randint(500, 1000))
+                continue
+
+        if domain in response_query.text:
+            response_tb = requests.get(&#39;https://www.t00ls.com/members-tubilog.json&#39;, headers=req_headers,cookies=t00ls_cookies,timeout=15)
+            if domain in response_tb.text:
+                print(&#39;查询域名成功 TuBi + 1&#39;)
+                content += &#39;查询域名成功 TuBi + 1\n\n&#39;
+                # query_status = True
+                break
+            else:
+                print(f&#39;糟糕 域名查询成功 但是 TuBi 没有增加 域名是: &#123;domain&#125;&#39;)
+                content += f&#39;糟糕 域名查询成功 但是 TuBi 没有增加 域名是: &#123;domain&#125;\n\n&#39;
+                query_count += 1
+                print(f&#39;随机延时 500-1000 秒，继续第 &#123;query_count&#125; 次查询&#39;)
+                content += f&#39;随机延时 500-1000 秒，继续第 &#123;query_count&#125; 次查询\n&#39;
+                time.sleep(random.randint(500, 1000))
+        else:
+            print(f&#39;查询失败？失败的域名是: &#123;domain&#125;&#39;)
+            content += f&#39;查询失败？失败的域名是: &#123;domain&#125;\n\n&#39;
+            query_count += 1
+            print(f&#39;随机延时 500-1000 秒，继续第 &#123;query_count&#125; 次查询&#39;)
+            content += f&#39;随机延时 500-1000 秒，继续第 &#123;query_count&#125; 次查询\n&#39;
+            time.sleep(random.randint(500, 1000))
+        if query_count == 4:
+            print(&#39;重试查询次数已达上限 终止查询&#39;)
+            content += &#39;重试查询次数已达上限 终止查询\n\n&#39;
+
+    end_time = time.time()
+    print(f&#39;t00ls 域名查询耗时: &#123;end_time - start_time:.0f&#125;秒&#39;)
+    content += f&#39;t00ls 域名查询耗时: &#123;end_time - start_time:.0f&#125;秒\n&#39;
+    return content
+
+def main():
+    response_login = t00ls_login(username, password, question_num, question_answer)
+    if response_login:
+        response_sign = t00ls_sign(response_login[0], response_login[1])
+        if response_sign[&#39;status&#39;] == &#39;success&#39;:
+            print(&#39;签到成功&#39;)
+            content = &#39;签到成功\n&#39;
+            domain_list_log = domains()
+            verbose_log = t00ls_domain(response_login[0], response_login[1],domain_list_log[0],domain_list_log[1])
+            content += verbose_log
+        elif response_sign[&#39;message&#39;] == &#39;alreadysign&#39;:
+            print(&#39;今日已签到&#39;)
+            content = &#39;今日已签到\n&#39;
+            domain_list_log = domains()
+            verbose_log = t00ls_domain(response_login[0], response_login[1],domain_list_log[0],domain_list_log[1])
+            content += verbose_log
+        else:
+            print(&#39;出现玄学问题了 签到失败&#39;)
+            content = &#39;出现玄学问题了 签到失败&#39;
+    else:
+        print(&#39;登入失败 请检查输入资料是否正确&#39;)
+        content = &#39;登入失败 请检查输入资料是否正确&#39;
+
+    &quot;&quot;&quot;
+    钉钉通知函数
+    :param content: 要通知的内容
+    :return: none
+    &quot;&quot;&quot;
+    webhook_url = webhook
+    dd_headers = &#123;
+        &quot;Content-Type&quot;: &quot;application/json&quot;,
+        &quot;Charset&quot;: &quot;UTF-8&quot;
+    &#125;
+    dd_message = &#123;
+        &quot;msgtype&quot;: &quot;text&quot;,
+        &quot;text&quot;: &#123;
+            &quot;content&quot;: f&#39;T00ls 签到通知\n\n&#123;content&#125;&#39;
+        &#125;
+    &#125;
+
+    requests.post(url=webhook_url, headers=dd_headers, data=json.dumps(dd_message))
+
+if __name__ == &#39;__main__&#39;:
+    main()
+</code></pre>
+<p><a target="_blank" rel="noopener" href="https://2captcha.com/2captcha-api">2captcha开发文档</a></p>
+<h2 id="成果展示"><a href="#成果展示" class="headerlink" title="成果展示"></a>成果展示</h2><p>脚本挂到服务器创建定时任务，每天会自动进行签到和域名查询</p>
+<p><img src="/../imgs/T00ls%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%E8%84%9A%E6%9C%AC/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20230417180512.jpg" alt="微信图片_20230417180512"></p>
+<h2 id="参考来源"><a href="#参考来源" class="headerlink" title="参考来源"></a>参考来源</h2><p>以上文章以及代码在基于国光师傅文章进行修改<br><a target="_blank" rel="noopener" href="https://www.sqlsec.com/2020/07/t00ls.html">点击查看原文</a></p>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
+</div>
+
+            <footer id="footer">
+    <div id="footer-wrap">
+        <div>
+            &copy;
+            2022 - 2024 W000i
+            <span id="footer-icon">
+                <i class="fa-solid fa-font-awesome fa-fw"></i>
+            </span>
+            &commat;W00i
+        </div>
+        <div>
+            Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;
+            <a target="_blank" rel="noopener" href="https://github.com/theme-particlex/hexo-theme-particlex">ParticleX Theme</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+        
+        <transition name="fade">
+            <div id="preview" ref="preview" v-show="previewShow">
+                <img id="preview-content" ref="previewContent" />
+            </div>
+        </transition>
+        
+    </div>
+    <script src="/js/main.js"></script>
+    
+    
+
+
+
+
+    
+	
+	
+	{% if theme.fireworks %}
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/lib/fireworks.js"></script>
+    {% endif %}
+ 
+</body>
+</html>

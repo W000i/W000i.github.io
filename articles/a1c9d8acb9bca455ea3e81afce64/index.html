@@ -1,0 +1,248 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+    <title>SPF发件伪造漏洞 | W000i</title>
+    <meta name="author" content="W00i" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <link rel="icon" href="/images/avatar.jpg" />
+    <link rel="preconnect" href="https://s4.zstatic.net" />
+<script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.cn" />
+<link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin />
+<link
+    rel="stylesheet"
+    href="https://fonts.googleapis.cn/css2?family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap"
+/>
+<script> const mixins = {}; </script>
+
+<script src="https://polyfill.alicdn.com/v3/polyfill.min.js?features=default"></script>
+
+
+<script src="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://s4.zstatic.net/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<link
+    rel="stylesheet"
+    href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+/>
+<script src="/js/lib/highlight.js"></script>
+
+
+
+<script src="/js/lib/preview.js"></script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css" />
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+<body>
+    <div id="layout">
+        <transition name="fade">
+            <div id="loading" v-show="loading">
+                <div id="loading-circle">
+                    <h2>LOADING</h2>
+                    <p>加载过慢请开启缓存 浏览器默认开启</p>
+                    <img src="/images/loading.gif" />
+                </div>
+            </div>
+        </transition>
+        <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
+    <nav id="desktop-menu">
+        <a class="title" href="/">
+            <span>W000I</span>
+        </a>
+        
+        <a href="/">
+            <i class="fa-solid fa-house fa-fw"></i>
+            <span>&ensp;主页</span>
+        </a>
+        
+    </nav>
+    <nav id="mobile-menu">
+        <div class="title" @click="showMenuItems = !showMenuItems">
+            <i class="fa-solid fa-bars fa-fw"></i>
+            <span>&emsp;W000I</span>
+        </div>
+        <transition name="slide">
+            <div class="items" v-show="showMenuItems">
+                
+                <a href="/">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-house fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">主页</div>
+                    </div>
+                </a>
+                
+            </div>
+        </transition>
+    </nav>
+</div>
+<transition name="fade">
+    <div id="menu-curtain" @click="showMenuItems = !showMenuItems" v-show="showMenuItems"></div>
+</transition>
+
+        <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
+            <div class="article">
+    <div>
+        <h1>SPF发件伪造漏洞</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/8/19
+        </span>
+        
+        
+        <span class="tags">
+            <span class="icon">
+                <i class="fa-solid fa-tags fa-fw"></i>
+            </span>
+            
+            
+            <span class="tag">
+                
+                <a href="/tags/%E6%B8%97%E9%80%8F/" style="color: #00bcd4">
+                    渗透
+                </a>
+            </span>
+            
+        </span>
+        
+    </div>
+    
+    <div class="content" v-pre>
+        <h2 id="SPF介绍"><a href="#SPF介绍" class="headerlink" title="SPF介绍"></a>SPF介绍</h2><p>发件人策略框架（SPF）是一种用于验证邮件发件人身份的技术，旨在防止伪造邮件和垃圾邮件。然而，SPF配置中的漏洞可能导致发件人伪造攻击，使得攻击者能够冒充合法的发件人身份，造成严重的安全隐患。</p>
+<span id="more"></span>
+
+<h2 id="SPF的工作原理"><a href="#SPF的工作原理" class="headerlink" title="SPF的工作原理"></a><strong>SPF的工作原理</strong></h2><p><strong>SPF定义和基本原理：</strong></p>
+<ul>
+<li>SPF（Sender Policy Framework）是一种防止电子邮件伪造的技术，它通过定义哪些IP地址被授权以特定域名发件的方式来验证邮件的来源。发件人域名的DNS记录中包含一个SPF记录，说明哪些邮件服务器可以合法地代表该域名发送邮件。</li>
+</ul>
+<p><strong>SPF记录的结构和配置：</strong></p>
+<p>SPF记录是一种DNS TXT记录，其基本格式如下：</p>
+<pre><code>v=spf1 ip4:192.0.2.0/24 -all
+</code></pre>
+<ul>
+<li><code>v=spf1</code> 表示这是一个SPF记录。</li>
+<li><code>ip4:192.0.2.0/24</code> 指定了允许发送邮件的IP地址范围。</li>
+<li><code>-all</code> 表示其他所有IP地址都不被允许发件。</li>
+</ul>
+<p>配置SPF记录时，需要在DNS管理控制台中添加一条TXT记录，确保其与实际的发件服务器配置匹配。</p>
+<h2 id="SPF伪造漏洞解析"><a href="#SPF伪造漏洞解析" class="headerlink" title="SPF伪造漏洞解析"></a><strong>SPF伪造漏洞解析</strong></h2><p><strong>漏洞产生的原因：</strong></p>
+<p>SPF伪造漏洞通常源于SPF记录配置不当或不完整。攻击者可以利用这些漏洞，通过伪造合法的发件人地址来发送欺诈性邮件。主要原因包括。</p>
+<ul>
+<li>SPF记录未涵盖所有合法的邮件发送服务器。</li>
+<li>SPF记录配置错误或遗漏。</li>
+<li>SPF记录过于宽松，允许了过多的IP地址。</li>
+</ul>
+<p><strong>案例分析：</strong></p>
+<p>某公司配置的SPF记录如下：</p>
+<pre><code>dig -t txt xxx.cn
+; &lt;&lt;&gt;&gt; DiG 9.19.19-1-Debian &lt;&lt;&gt;&gt; -t txt xxx.cn
+;; global options: +cmd
+;; Got answer:
+;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 31777
+;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 0
+
+;; QUESTION SECTION:
+;xxx.cn.               IN      TXT
+
+;; AUTHORITY SECTION:
+xxx.cn.        5       IN      SOA     dns.bizcn.com. abuse.bizcn.com. 23 28800 14400 14400 600
+
+;; Query time: 192 msec
+;; SERVER: 192.168.74.2#53(192.168.74.2) (UDP)
+;; WHEN: Sun Aug 18 22:35:01 EDT 2024
+;; MSG SIZE  rcvd: 88
+</code></pre>
+<p>查询结果显示<code>ANSWER: 0</code> 表明没有找到与 SPF 相关的 TXT 记录。</p>
+<p><code>AUTHORITY SECTION</code> 只显示了 SOA（Start of Authority）记录，没有 SPF 记录。</p>
+<p>这意味着当前 DNS配置中没有设置SPF记录，</p>
+<h2 id="影响和风险评估"><a href="#影响和风险评估" class="headerlink" title="影响和风险评估"></a><strong>影响和风险评估</strong></h2><p>攻击者通过伪造发件人地址可能会进行钓鱼攻击，造成企业声誉受损。</p>
+<p>使用swaks发送一封电子邮件到自己邮箱。</p>
+<pre><code>swaks --body &quot;Test2&quot; --header &quot;Subject:Test1&quot; -t 1888888888@163.com -f admin@xxx.cn
+</code></pre>
+<p><img src="/../imgs/SPF%E5%8F%91%E4%BB%B6%E4%BC%AA%E9%80%A0%E6%BC%8F%E6%B4%9E/image-20240819104340332.png" alt="image-20240819104340332"></p>
+<p>163收到了邮件</p>
+<p><img src="/../imgs/SPF%E5%8F%91%E4%BB%B6%E4%BC%AA%E9%80%A0%E6%BC%8F%E6%B4%9E/image-20240819104421525.png" alt="image-20240819104421525"></p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a><strong>解决方案</strong></h2><ul>
+<li><strong>更新SPF记录：</strong> 确保SPF记录包含所有合法的邮件发送IP地址，并定期审核更新。</li>
+<li><strong>使用<code>+all</code>、<code>?all</code>等标志：</strong> 避免使用<code>+all</code>（任何IP都允许）或<code>?all</code>（中立）等宽松的设置。</li>
+<li><strong>配置DNS TXT记录：</strong> 定期检查和验证DNS TXT记录的准确性。</li>
+</ul>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a><strong>结论</strong></h2><p>SPF伪造漏洞是一种严重的安全威胁，它可能导致发件人身份被伪造，影响企业的品牌信誉和数据安全。通过正确配置SPF记录并定期审查和监控，可以有效降低这些风险。</p>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
+</div>
+
+            <footer id="footer">
+    <div id="footer-wrap">
+        <div>
+            &copy;
+            2022 - 2024 W000i
+            <span id="footer-icon">
+                <i class="fa-solid fa-font-awesome fa-fw"></i>
+            </span>
+            &commat;W00i
+        </div>
+        <div>
+            Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;
+            <a target="_blank" rel="noopener" href="https://github.com/theme-particlex/hexo-theme-particlex">ParticleX Theme</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+        
+        <transition name="fade">
+            <div id="preview" ref="preview" v-show="previewShow">
+                <img id="preview-content" ref="previewContent" />
+            </div>
+        </transition>
+        
+    </div>
+    <script src="/js/main.js"></script>
+    
+    
+
+
+
+
+    
+	
+	
+	{% if theme.fireworks %}
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/lib/fireworks.js"></script>
+    {% endif %}
+ 
+</body>
+</html>

@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+    <title>Hook过root检测 | W000i</title>
+    <meta name="author" content="W00i" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <link rel="icon" href="/images/avatar.jpg" />
+    <link rel="preconnect" href="https://s4.zstatic.net" />
+<script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.cn" />
+<link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin />
+<link
+    rel="stylesheet"
+    href="https://fonts.googleapis.cn/css2?family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap"
+/>
+<script> const mixins = {}; </script>
+
+<script src="https://polyfill.alicdn.com/v3/polyfill.min.js?features=default"></script>
+
+
+<script src="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://s4.zstatic.net/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<link
+    rel="stylesheet"
+    href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+/>
+<script src="/js/lib/highlight.js"></script>
+
+
+
+<script src="/js/lib/preview.js"></script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css" />
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+<body>
+    <div id="layout">
+        <transition name="fade">
+            <div id="loading" v-show="loading">
+                <div id="loading-circle">
+                    <h2>LOADING</h2>
+                    <p>加载过慢请开启缓存 浏览器默认开启</p>
+                    <img src="/images/loading.gif" />
+                </div>
+            </div>
+        </transition>
+        <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
+    <nav id="desktop-menu">
+        <a class="title" href="/">
+            <span>W000I</span>
+        </a>
+        
+        <a href="/">
+            <i class="fa-solid fa-house fa-fw"></i>
+            <span>&ensp;主页</span>
+        </a>
+        
+    </nav>
+    <nav id="mobile-menu">
+        <div class="title" @click="showMenuItems = !showMenuItems">
+            <i class="fa-solid fa-bars fa-fw"></i>
+            <span>&emsp;W000I</span>
+        </div>
+        <transition name="slide">
+            <div class="items" v-show="showMenuItems">
+                
+                <a href="/">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-house fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">主页</div>
+                    </div>
+                </a>
+                
+            </div>
+        </transition>
+    </nav>
+</div>
+<transition name="fade">
+    <div id="menu-curtain" @click="showMenuItems = !showMenuItems" v-show="showMenuItems"></div>
+</transition>
+
+        <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
+            <div class="article">
+    <div>
+        <h1>Hook过root检测</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/8/19
+        </span>
+        
+        
+        <span class="tags">
+            <span class="icon">
+                <i class="fa-solid fa-tags fa-fw"></i>
+            </span>
+            
+            
+            <span class="tag">
+                
+                <a href="/tags/Frida/" style="color: #03a9f4">
+                    Frida
+                </a>
+            </span>
+            
+        </span>
+        
+    </div>
+    
+    <div class="content" v-pre>
+        <p>Frida是一种基于JavaScript的动态分析工具,可以用于逆向开发、应用程序的安全测试、反欺诈技术等领域。</p>
+<span id="more"></span>
+
+<p>安装后打开提示设备已经root<br><img src="/../imgs/Hook%E8%BF%87root%E6%A3%80%E6%B5%8B/image-1720445550797-17241352799522.png" alt="image-1720445550797"><br>使用jadx搜索关键字：已经root<br><img src="/../imgs/Hook%E8%BF%87root%E6%A3%80%E6%B5%8B/image-1720445581410.png" alt="image-1720445581410"><br>上面有一个判断，条件不成立就跳到弹窗<br><img src="/../imgs/Hook%E8%BF%87root%E6%A3%80%E6%B5%8B/image-1720445586922.png" alt="image-1720445586922"><br>A方法是取反的，让它改成false取反就是true，尝试一下</p>
+<p>查看逍遥模拟器cpu为x86-64<br>adb shell getprop ro.product.cpu.abi<br><img src="/../imgs/Hook%E8%BF%87root%E6%A3%80%E6%B5%8B/image-1720445631763.png" alt="image-1720445631763"></p>
+<p>下载frida对应版本推送到安卓<br><img src="/../imgs/Hook%E8%BF%87root%E6%A3%80%E6%B5%8B/image-1720445635789.png" alt="image-1720445635789"></p>
+<p>编写代码</p>
+<pre><code>Java.perform(function ()&#123;
+    var SplashActivity = Java.use(&quot;com.niming.weipa.ui.splash.SplashActivity&quot;);
+    console.log(&quot;111&quot;);
+    SplashActivity.A.implementation = function() &#123;
+        console.log(&quot;222&quot;);
+        return false;
+    &#125;
+&#125;)
+</code></pre>
+<p><img src="/../imgs/Hook%E8%BF%87root%E6%A3%80%E6%B5%8B/image-1720445660824.png" alt="image-1720445660824"></p>
+<p>&#x2F;&#x2F;com.niming.weipa.ui.splash.SplashActivity直接复制jadx包名<br>&#x2F;&#x2F;SplashActivity &#x3D; 包名<br>&#x2F;&#x2F;SplashActivity.A.implementation&#x3D;调用SplashActivity类的A方法</p>
+<p>&#x2F;&#x2F; return false;吧A方法返回改为false</p>
+<p>hook命令<br>frida -U -f com.wechat.novembertwentythree_1209 -l C:\Users\Administrator\Desktop\yidong\NodejsConsoleApp1\NodejsConsoleApp1\app.js</p>
+<p>&#x2F;&#x2F; com.wechat.novembertwentythree_1209为软件包名<br>&#x2F;&#x2F;-l参数为加载的js<br><img src="/../imgs/Hook%E8%BF%87root%E6%A3%80%E6%B5%8B/image-1720445711749.png" alt="image-1720445711749"></p>
+<p>看到成功输出222，Hook成功<br><img src="/../imgs/Hook%E8%BF%87root%E6%A3%80%E6%B5%8B/image-1720445687246.png" alt="image-1720445687246"></p>
+<p>过root加代理代码</p>
+<pre><code>Java.perform(function ()&#123;
+    var SplashActivity = Java.use(&quot;com.niming.weipa.ui.splash.SplashActivity&quot;);
+    console.log(&quot;进入HOOK&quot;);
+    SplashActivity.A.implementation = function() &#123;
+        console.log(&quot;过rootok&quot;);
+        return false;
+    &#125;
+    SplashActivity[&quot;a&quot;].overload(&#39;android.content.Context&#39;).implementation = function (context) &#123;
+        let ret = this.a(context);
+        console.log(&quot;过代理ok&quot;);
+        return true;
+    &#125;
+&#125;)
+</code></pre>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
+</div>
+
+            <footer id="footer">
+    <div id="footer-wrap">
+        <div>
+            &copy;
+            2022 - 2024 W000i
+            <span id="footer-icon">
+                <i class="fa-solid fa-font-awesome fa-fw"></i>
+            </span>
+            &commat;W00i
+        </div>
+        <div>
+            Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;
+            <a target="_blank" rel="noopener" href="https://github.com/theme-particlex/hexo-theme-particlex">ParticleX Theme</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+        
+        <transition name="fade">
+            <div id="preview" ref="preview" v-show="previewShow">
+                <img id="preview-content" ref="previewContent" />
+            </div>
+        </transition>
+        
+    </div>
+    <script src="/js/main.js"></script>
+    
+    
+
+
+
+
+    
+	
+	
+	{% if theme.fireworks %}
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/lib/fireworks.js"></script>
+    {% endif %}
+ 
+</body>
+</html>

