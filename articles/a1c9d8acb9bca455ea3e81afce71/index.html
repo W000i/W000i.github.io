@@ -4,7 +4,7 @@
 <head>
 
     <meta charset="utf-8" />
-    <title>Hook过root检测 | W000i</title>
+    <title>CrackMe-新手的突发奇想 | W000i</title>
     <meta name="author" content="W00i" />
     <meta name="description" content="" />
     <meta name="keywords" content="" />
@@ -101,7 +101,7 @@
         <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
             <div class="article">
     <div>
-        <h1>Hook过root检测</h1>
+        <h1>CrackMe-新手的突发奇想</h1>
     </div>
     <div class="info">
         <span class="date">
@@ -120,8 +120,8 @@
             
             <span class="tag">
                 
-                <a href="/tags/Frida/" style="color: #ff7d73">
-                    Frida
+                <a href="/tags/%E6%B8%97%E9%80%8F/" style="color: #00a596">
+                    渗透
                 </a>
             </span>
             
@@ -130,43 +130,47 @@
     </div>
     
     <div class="content" v-pre>
-        <p>Frida是一种基于JavaScript的动态分析工具,可以用于逆向开发、应用程序的安全测试、反欺诈技术等领域。</p>
+        <p>Crackme是一种特别设计的小程序，其主要目的是测试程序设计人员的逆向工程技能。</p>
 <span id="more"></span>
 
-<p>安装后打开提示设备已经root<br><img src="/../imgs/Hook%E8%BF%87root%E6%A3%80%E6%B5%8B/image-1720445550797-17241352799522.png" alt="image-1720445550797"><br>使用jadx搜索关键字：已经root<br><img src="/../imgs/Hook%E8%BF%87root%E6%A3%80%E6%B5%8B/image-1720445581410.png" alt="image-1720445581410"><br>上面有一个判断，条件不成立就跳到弹窗<br><img src="/../imgs/Hook%E8%BF%87root%E6%A3%80%E6%B5%8B/image-1720445586922.png" alt="image-1720445586922"><br>A方法是取反的，让它改成false取反就是true，尝试一下</p>
-<p>查看逍遥模拟器cpu为x86-64<br>adb shell getprop ro.product.cpu.abi<br><img src="/../imgs/Hook%E8%BF%87root%E6%A3%80%E6%B5%8B/image-1720445631763.png" alt="image-1720445631763"></p>
-<p>下载frida对应版本推送到安卓<br><img src="/../imgs/Hook%E8%BF%87root%E6%A3%80%E6%B5%8B/image-1720445635789.png" alt="image-1720445635789"></p>
-<p>编写代码</p>
-<pre><code>Java.perform(function ()&#123;
-    var SplashActivity = Java.use(&quot;com.niming.weipa.ui.splash.SplashActivity&quot;);
-    console.log(&quot;111&quot;);
-    SplashActivity.A.implementation = function() &#123;
-        console.log(&quot;222&quot;);
-        return false;
-    &#125;
-&#125;)
-</code></pre>
-<p><img src="/../imgs/Hook%E8%BF%87root%E6%A3%80%E6%B5%8B/image-1720445660824.png" alt="image-1720445660824"></p>
-<p>&#x2F;&#x2F;com.niming.weipa.ui.splash.SplashActivity直接复制jadx包名<br>&#x2F;&#x2F;SplashActivity &#x3D; 包名<br>&#x2F;&#x2F;SplashActivity.A.implementation&#x3D;调用SplashActivity类的A方法</p>
-<p>&#x2F;&#x2F; return false;吧A方法返回改为false</p>
-<p>hook命令<br>frida -U -f com.wechat.novembertwentythree_1209 -l C:\Users\Administrator\Desktop\yidong\NodejsConsoleApp1\NodejsConsoleApp1\app.js</p>
-<p>&#x2F;&#x2F; com.wechat.novembertwentythree_1209为软件包名<br>&#x2F;&#x2F;-l参数为加载的js<br><img src="/../imgs/Hook%E8%BF%87root%E6%A3%80%E6%B5%8B/image-1720445711749.png" alt="image-1720445711749"></p>
-<p>看到成功输出222，Hook成功<br><img src="/../imgs/Hook%E8%BF%87root%E6%A3%80%E6%B5%8B/image-1720445687246.png" alt="image-1720445687246"></p>
-<p>过root加代理代码</p>
-<pre><code>Java.perform(function ()&#123;
-    var SplashActivity = Java.use(&quot;com.niming.weipa.ui.splash.SplashActivity&quot;);
-    console.log(&quot;进入HOOK&quot;);
-    SplashActivity.A.implementation = function() &#123;
-        console.log(&quot;过rootok&quot;);
-        return false;
-    &#125;
-    SplashActivity[&quot;a&quot;].overload(&#39;android.content.Context&#39;).implementation = function (context) &#123;
-        let ret = this.a(context);
-        console.log(&quot;过代理ok&quot;);
-        return true;
-    &#125;
-&#125;)
-</code></pre>
+<h2 id="方法一"><a href="#方法一" class="headerlink" title="方法一"></a>方法一</h2><p>输入密码会弹出一个窗口</p>
+<p><img src="/../imgs/CrackMe-%E6%96%B0%E6%89%8B%E7%9A%84%E7%AA%81%E5%8F%91%E5%A5%87%E6%83%B3/wps1.jpg" alt="img"> </p>
+<p>下一个对话框断点</p>
+<p>bp MessageBoxA</p>
+<p>断下后返回到用户代码</p>
+<p>00422EF5调用了00422E00弹窗了，上面还有个cmp用于比较用户输入的字符长度，jpg跳转未实现，给他改成jmp</p>
+<p><img src="/../imgs/CrackMe-%E6%96%B0%E6%89%8B%E7%9A%84%E7%AA%81%E5%8F%91%E5%A5%87%E6%83%B3/wps2.jpg" alt="img"> </p>
+<p>00422F09弹窗失败</p>
+<p><img src="/../imgs/CrackMe-%E6%96%B0%E6%89%8B%E7%9A%84%E7%AA%81%E5%8F%91%E5%A5%87%E6%83%B3/wps3.jpg" alt="img"> </p>
+<p>跟进去看看，有个大跳转</p>
+<p><img src="/../imgs/CrackMe-%E6%96%B0%E6%89%8B%E7%9A%84%E7%AA%81%E5%8F%91%E5%A5%87%E6%83%B3/wps4.jpg" alt="img"> </p>
+<p>并且跳过去直接call 00422E00，刚才就是call这个弹窗失败，这里就不能让他跳转</p>
+<p><img src="/../imgs/CrackMe-%E6%96%B0%E6%89%8B%E7%9A%84%E7%AA%81%E5%8F%91%E5%A5%87%E6%83%B3/wps5.jpg" alt="img"> </p>
+<p>nop掉je跳转</p>
+<p><img src="/../imgs/CrackMe-%E6%96%B0%E6%89%8B%E7%9A%84%E7%AA%81%E5%8F%91%E5%A5%87%E6%83%B3/wps6.jpg" alt="img"> </p>
+<p>又发现一个大跳转</p>
+<p><img src="/../imgs/CrackMe-%E6%96%B0%E6%89%8B%E7%9A%84%E7%AA%81%E5%8F%91%E5%A5%87%E6%83%B3/wps7.jpg" alt="img"> </p>
+<p>同样跳过去调用了00422E00，再次nop掉</p>
+<p><img src="/../imgs/CrackMe-%E6%96%B0%E6%89%8B%E7%9A%84%E7%AA%81%E5%8F%91%E5%A5%87%E6%83%B3/wps8.jpg" alt="img"> </p>
+<p>往下跟到00423138失败了</p>
+<p><img src="/../imgs/CrackMe-%E6%96%B0%E6%89%8B%E7%9A%84%E7%AA%81%E5%8F%91%E5%A5%87%E6%83%B3/wps9.jpg" alt="img"> </p>
+<p>跟进去在00423264有一个判断，跳转未实现，下一步要调用00422E00，就是弹窗失败</p>
+<p><img src="/../imgs/CrackMe-%E6%96%B0%E6%89%8B%E7%9A%84%E7%AA%81%E5%8F%91%E5%A5%87%E6%83%B3/wps10.jpg" alt="img"> </p>
+<p>改成jmp继续</p>
+<p><img src="/../imgs/CrackMe-%E6%96%B0%E6%89%8B%E7%9A%84%E7%AA%81%E5%8F%91%E5%A5%87%E6%83%B3/wps11.jpg" alt="img"> </p>
+<p>00423356弹窗失败</p>
+<p><img src="/../imgs/CrackMe-%E6%96%B0%E6%89%8B%E7%9A%84%E7%AA%81%E5%8F%91%E5%A5%87%E6%83%B3/wps12.jpg" alt="img"> </p>
+<p>再跟进去，004245E7跳转未实现，下一步就是调用弹窗失败的函数</p>
+<p><img src="/../imgs/CrackMe-%E6%96%B0%E6%89%8B%E7%9A%84%E7%AA%81%E5%8F%91%E5%A5%87%E6%83%B3/wps13.jpg" alt="img"> </p>
+<p>换成jmp继续跟，这个je要nop掉，不然直接到失败对话框了</p>
+<p><img src="/../imgs/CrackMe-%E6%96%B0%E6%89%8B%E7%9A%84%E7%AA%81%E5%8F%91%E5%A5%87%E6%83%B3/wps14.jpg" alt="img"> </p>
+<p>Nop掉下一个函数就是成功的对话框</p>
+<p>00424694</p>
+<p><img src="/../imgs/CrackMe-%E6%96%B0%E6%89%8B%E7%9A%84%E7%AA%81%E5%8F%91%E5%A5%87%E6%83%B3/wps15.jpg" alt="img"> </p>
+<h2 id="方法二"><a href="#方法二" class="headerlink" title="方法二"></a>方法二</h2><p>目前知道了00429631是“算你厉害”</p>
+<p>00422EF0地址的call换成429631</p>
+<p><img src="/../imgs/CrackMe-%E6%96%B0%E6%89%8B%E7%9A%84%E7%AA%81%E5%8F%91%E5%A5%87%E6%83%B3/wps16.jpg" alt="img"> </p>
+<p><img src="/../imgs/CrackMe-%E6%96%B0%E6%89%8B%E7%9A%84%E7%AA%81%E5%8F%91%E5%A5%87%E6%83%B3/wps17.jpg" alt="img"> </p>
 
     </div>
     
