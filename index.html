@@ -126,6 +126,46 @@
         
 
 <div class="post">
+    <a href="/articles/a1c9d8acb9bca455ea3e81afce68/">
+        <h2 class="post-title">Shiro权限认证绕过漏洞分析(CVE-2023-22602)</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/8
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <p>shiro 在 1.11.0版本之前，当与spring boot 2.6以上版本组合使用的时候，在默认配置下，配合特定的路由规则，攻击者可以通过发送特殊的请求造成shiro中的鉴权绕过。</p>
+<p>大致原理为&#x2F;admin&#x2F;..会被Shiro识别为&#x2F;，大多数Shiro配置对&#x2F;是允许匿名访问，Spring的controller通过**或者{path}识别到了..，从而导致被绕过。</p>
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        <span class="icon">
+            <i class="fa-solid fa-tags fa-fw"></i>
+        </span>
+        
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/Java/" style="color: #00a596">Java</a>
+        </span>
+        
+    </div>
+    <a href="/articles/a1c9d8acb9bca455ea3e81afce68/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
     <a href="/articles/a1c9d8acb9bca455ea3e81afce80/">
         <h2 class="post-title">初探缓冲区溢出</h2>
     </a>
@@ -157,7 +197,7 @@
         
         <span class="tag">
             
-            <a href="/tags/%E9%80%86%E5%90%91/" style="color: #00a596">逆向</a>
+            <a href="/tags/%E9%80%86%E5%90%91/" style="color: #ffa2c4">逆向</a>
         </span>
         
     </div>
@@ -196,7 +236,7 @@
         
         <span class="tag">
             
-            <a href="/tags/%E9%80%86%E5%90%91/" style="color: #00a596">逆向</a>
+            <a href="/tags/%E9%80%86%E5%90%91/" style="color: #00bcd4">逆向</a>
         </span>
         
     </div>
@@ -235,7 +275,7 @@
         
         <span class="tag">
             
-            <a href="/tags/%E6%B8%97%E9%80%8F/" style="color: #ffa2c4">渗透</a>
+            <a href="/tags/%E6%B8%97%E9%80%8F/" style="color: #00bcd4">渗透</a>
         </span>
         
     </div>
@@ -274,7 +314,7 @@
         
         <span class="tag">
             
-            <a href="/tags/%E6%B8%97%E9%80%8F/" style="color: #03a9f4">渗透</a>
+            <a href="/tags/%E6%B8%97%E9%80%8F/" style="color: #00bcd4">渗透</a>
         </span>
         
     </div>
@@ -318,7 +358,7 @@
         
         <span class="tag">
             
-            <a href="/tags/C-C/" style="color: #ff7d73">C/C++</a>
+            <a href="/tags/C-C/" style="color: #00a596">C/C++</a>
         </span>
         
     </div>
@@ -357,7 +397,7 @@
         
         <span class="tag">
             
-            <a href="/tags/%E7%A0%B4%E8%A7%A3/" style="color: #03a9f4">破解</a>
+            <a href="/tags/%E7%A0%B4%E8%A7%A3/" style="color: #00bcd4">破解</a>
         </span>
         
     </div>
@@ -396,7 +436,7 @@
         
         <span class="tag">
             
-            <a href="/tags/Java/" style="color: #03a9f4">Java</a>
+            <a href="/tags/Java/" style="color: #ff7d73">Java</a>
         </span>
         
     </div>
@@ -435,7 +475,7 @@
         
         <span class="tag">
             
-            <a href="/tags/Java/" style="color: #ff7d73">Java</a>
+            <a href="/tags/Java/" style="color: #ffa2c4">Java</a>
         </span>
         
     </div>
@@ -479,45 +519,6 @@
         
     </div>
     <a href="/articles/a1c9d8acb9bca455ea3e81afce2/" class="go-post">阅读全文</a>
-</div>
-
-<div class="post">
-    <a href="/articles/a1c9d8acb9bca455ea3e81afce51/">
-        <h2 class="post-title">CC7分析</h2>
-    </a>
-    <div class="category-and-date">
-        
-        <span class="date">
-            <span class="icon">
-                <i class="fa-solid fa-calendar fa-fw"></i>
-            </span>
-            2024/8/19
-        </span>
-        
-        
-    </div>
-    <div class="description">
-        <div class="content" v-pre>
-            
-            <p>Commons Collections是Apache软件基金会的一个开源项目，它提供了一组可复用的数据结构和算法的实现，旨在扩展和增强Java集合框架，以便更好地满足不同类型应用的需求。该项目包含了多种不同类型的集合类、迭代器、队列、堆栈、映射、列表、集等数据结构实现，以及许多实用程序类和算法实现。它的代码质量较高，被广泛应用于Java应用程序开发中。</p>
-            
-        </div>
-    </div>
-    <div class="post-tags">
-        
-        <span class="icon">
-            <i class="fa-solid fa-tags fa-fw"></i>
-        </span>
-        
-        
-        
-        <span class="tag">
-            
-            <a href="/tags/Java/" style="color: #ff7d73">Java</a>
-        </span>
-        
-    </div>
-    <a href="/articles/a1c9d8acb9bca455ea3e81afce51/" class="go-post">阅读全文</a>
 </div>
 
 

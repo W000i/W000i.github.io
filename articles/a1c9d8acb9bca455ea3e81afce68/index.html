@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+    <title>Shiro权限认证绕过漏洞分析(CVE-2023-22602) | W000i</title>
+    <meta name="author" content="W00i" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <link rel="icon" href="/images/avatar.jpg" />
+    <link rel="preconnect" href="https://s4.zstatic.net" />
+<script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.cn" />
+<link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin />
+<link
+    rel="stylesheet"
+    href="https://fonts.googleapis.cn/css2?family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap"
+/>
+<script> const mixins = {}; </script>
+
+<script src="https://polyfill.alicdn.com/v3/polyfill.min.js?features=default"></script>
+
+
+<script src="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://s4.zstatic.net/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<link
+    rel="stylesheet"
+    href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+/>
+<script src="/js/lib/highlight.js"></script>
+
+
+
+<script src="/js/lib/preview.js"></script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css" />
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+<body>
+    <div id="layout">
+        <transition name="fade">
+            <div id="loading" v-show="loading">
+                <div id="loading-circle">
+                    <h2>LOADING</h2>
+                    <p>加载过慢请开启缓存 浏览器默认开启</p>
+                    <img src="/images/loading.gif" />
+                </div>
+            </div>
+        </transition>
+        <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
+    <nav id="desktop-menu">
+        <a class="title" href="/">
+            <span>W000I</span>
+        </a>
+        
+        <a href="/">
+            <i class="fa-solid fa-house fa-fw"></i>
+            <span>&ensp;主页</span>
+        </a>
+        
+    </nav>
+    <nav id="mobile-menu">
+        <div class="title" @click="showMenuItems = !showMenuItems">
+            <i class="fa-solid fa-bars fa-fw"></i>
+            <span>&emsp;W000I</span>
+        </div>
+        <transition name="slide">
+            <div class="items" v-show="showMenuItems">
+                
+                <a href="/">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-house fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">主页</div>
+                    </div>
+                </a>
+                
+            </div>
+        </transition>
+    </nav>
+</div>
+<transition name="fade">
+    <div id="menu-curtain" @click="showMenuItems = !showMenuItems" v-show="showMenuItems"></div>
+</transition>
+
+        <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
+            <div class="article">
+    <div>
+        <h1>Shiro权限认证绕过漏洞分析(CVE-2023-22602)</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/8
+        </span>
+        
+        
+        <span class="tags">
+            <span class="icon">
+                <i class="fa-solid fa-tags fa-fw"></i>
+            </span>
+            
+            
+            <span class="tag">
+                
+                <a href="/tags/Java/" style="color: #00bcd4">
+                    Java
+                </a>
+            </span>
+            
+        </span>
+        
+    </div>
+    
+    <div class="content" v-pre>
+        <p>shiro 在 1.11.0版本之前，当与spring boot 2.6以上版本组合使用的时候，在默认配置下，配合特定的路由规则，攻击者可以通过发送特殊的请求造成shiro中的鉴权绕过。</p>
+<p>大致原理为&#x2F;admin&#x2F;..会被Shiro识别为&#x2F;，大多数Shiro配置对&#x2F;是允许匿名访问，Spring的controller通过**或者{path}识别到了..，从而导致被绕过。</p>
+<span id="more"></span>
+
+<h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><p>Shiro：1.10.1</p>
+<p>Spring-boot：2.6.1</p>
+<h2 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h2><p>在shiro过滤器PathMatchingFilterChainResolver#getChainget方法下断</p>
+<p>PathWithinApplication用于获取请求 URI</p>
+<p><img src="/../imgs/Shiro%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90(CVE-2023-22602)/image-20240908202040507.png" alt="image-20240908202040507"></p>
+<p>跟进getPathWithinApplication</p>
+<p><img src="/../imgs/Shiro%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90(CVE-2023-22602)/image-20240908202217309.png" alt="image-20240908202217309"></p>
+<p>继续跟getPathWithinApplication</p>
+<p>这个方法从请求中提取应用程序内的相对路径，移除路径中的分号，并对路径进行标准化处理。</p>
+<p><img src="/../imgs/Shiro%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90(CVE-2023-22602)/image-20240908203947665.png" alt="image-20240908203947665"></p>
+<p>现在传递的路径为&#x2F;admin&#x2F;..</p>
+<p><img src="/../imgs/Shiro%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90(CVE-2023-22602)/image-20240908204858198.png" alt="image-20240908204858198"></p>
+<p>normalize方法加工后变成了&#x2F;</p>
+<p>一般shiro配置针对根目录、js、css等目录会放行，这里shiro处理后的目录为&#x2F;，很多情况下是会放行的。</p>
+<p><img src="/../imgs/Shiro%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90(CVE-2023-22602)/image-20240908205007875.png" alt="image-20240908205007875"></p>
+<p>进入到Spring的路径处理中</p>
+<p>ServletRequestPathUtils#parseAndCache这个方法用于解析 HTTP 请求路径并将其缓存。</p>
+<p><img src="/../imgs/Shiro%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90(CVE-2023-22602)/image-20240908215011685.png" alt="image-20240908215011685"></p>
+<p>跟进ServletRequestPath.<em>parse</em></p>
+<p>这个方法会解析HttpServletRequest 对象中的请求路径，并返回一个 RequestPath 对象</p>
+<p><img src="/../imgs/Shiro%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90(CVE-2023-22602)/image-20240908215402683.png" alt="image-20240908215402683"></p>
+<p>返回到parseAndCache方法后requestPath和HttpServletRequest对象进行绑定，这样可以在同一个请求处理链中可以共享和访问路径信息。</p>
+<p><img src="/../imgs/Shiro%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90(CVE-2023-22602)/image-20240908215731213.png" alt="image-20240908215731213"></p>
+<p>然后根据路径去匹配对应的controller</p>
+<p>initLookupPath方法获取了传递的url（admin&#x2F;..）</p>
+<p><img src="/../imgs/Shiro%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90(CVE-2023-22602)/image-20240908221247171.png" alt="image-20240908221247171"></p>
+<p>返回一直往下跟到AbstractHandlerMethodMapping#addMatchingMappings</p>
+<p>这个方法从给定的映射集合中查找与当前请求匹配的映射，并将这些匹配的信息（包括映射和相关的注册信息）添加到一个列表中。</p>
+<p><img src="/../imgs/Shiro%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90(CVE-2023-22602)/image-20240908222305699.png" alt="image-20240908222305699"></p>
+<p>这里根据传递的LookupPath匹配到一个controller（&#x2F;admin&#x2F;{*path}）</p>
+<p><img src="/../imgs/Shiro%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90(CVE-2023-22602)/image-20240908222732059.png" alt="image-20240908222732059"></p>
+<p>然后寻找对应的Bean执行对应的方法</p>
+<p><img src="/../imgs/Shiro%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90(CVE-2023-22602)/image-20240908223318037.png" alt="image-20240908223318037"></p>
+<p>漏洞利用条件比较苛刻，路由需要为：</p>
+<p>“&#x2F;admin&#x2F;{*path}”</p>
+<p>“&#x2F;admin&#x2F;**”</p>
+<h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p>正常请求admin会重定向首页</p>
+<p><img src="/../imgs/Shiro%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90(CVE-2023-22602)/image-20240908224033982.png" alt="image-20240908224033982"></p>
+<p>加上&#x2F;..成功绕过限制</p>
+<p><img src="/../imgs/Shiro%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90(CVE-2023-22602)/image-20240908223859410.png" alt="image-20240908223859410"></p>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
+</div>
+
+            <footer id="footer">
+    <div id="footer-wrap">
+        <div>
+            &copy;
+            2022 - 2024 W000i
+            <span id="footer-icon">
+                <i class="fa-solid fa-font-awesome fa-fw"></i>
+            </span>
+            &commat;W00i
+        </div>
+        <div>
+            Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;
+            <a target="_blank" rel="noopener" href="https://github.com/theme-particlex/hexo-theme-particlex">ParticleX Theme</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+        
+        <transition name="fade">
+            <div id="preview" ref="preview" v-show="previewShow">
+                <img id="preview-content" ref="previewContent" />
+            </div>
+        </transition>
+        
+    </div>
+    <script src="/js/main.js"></script>
+    
+    
+
+
+
+
+    
+	
+	
+	{% if theme.fireworks %}
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/lib/fireworks.js"></script>
+    {% endif %}
+ 
+</body>
+</html>
