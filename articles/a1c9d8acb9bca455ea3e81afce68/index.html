@@ -131,9 +131,9 @@
     
     <div class="content" v-pre>
         <p>shiro 在 1.11.0版本之前，当与spring boot 2.6以上版本组合使用的时候，在默认配置下，配合特定的路由规则，攻击者可以通过发送特殊的请求造成shiro中的鉴权绕过。</p>
-<p>大致原理为&#x2F;admin&#x2F;..会被Shiro识别为&#x2F;，大多数Shiro配置对&#x2F;是允许匿名访问，Spring的controller通过**或者{path}识别到了..，从而导致被绕过。</p>
 <span id="more"></span>
 
+<p>大致原理为&#x2F;admin&#x2F;..会被Shiro识别为&#x2F;，大多数Shiro配置对&#x2F;是允许匿名访问，Spring的controller通过**或者{path}识别到了..，从而导致被绕过。</p>
 <h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><p>Shiro：1.10.1</p>
 <p>Spring-boot：2.6.1</p>
 <h2 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h2><p>在shiro过滤器PathMatchingFilterChainResolver#getChainget方法下断</p>

