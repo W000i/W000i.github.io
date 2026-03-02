@@ -126,6 +126,123 @@
         
 
 <div class="post">
+    <a href="/articles/94b2a3ea6aaa2602004e85bc47b0ca65/">
+        <h2 class="post-title">Struts2 DomHelper不安全的工厂配置(CVE-2025-68493)</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2026/2/3
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <p>DomHelper是Struts2框架内部解析XML配置文件的工具类，主要用于处理struts.xml及相关扩展配置。由于该方法设计时假设解析对象为“内部可信数据”，因此在XML解析器的安全配置上并未进行充分的加固。</p>
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        <span class="icon">
+            <i class="fa-solid fa-tags fa-fw"></i>
+        </span>
+        
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/Java/" style="color: #00a596">Java</a>
+        </span>
+        
+    </div>
+    <a href="/articles/94b2a3ea6aaa2602004e85bc47b0ca65/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
+    <a href="/articles/44eb51b14a60b7da3816eb87c797578c/">
+        <h2 class="post-title">readObject()到底在执行谁的代码</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2025/9/15
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <p>通过手动模拟 readObject() 的执行过程，来简单了解反序列化的调用过程。</p>
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        <span class="icon">
+            <i class="fa-solid fa-tags fa-fw"></i>
+        </span>
+        
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/Java/" style="color: #00a596">Java</a>
+        </span>
+        
+    </div>
+    <a href="/articles/44eb51b14a60b7da3816eb87c797578c/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
+    <a href="/articles/95fe95fd0904508210d706a9ece12e51/">
+        <h2 class="post-title">常见钓鱼攻击手段</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2025/6/23
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <p>钓鱼攻击通过伪装成可信赖的实体，利用社会工程学手段诱导用户泄露敏感信息或执行恶意操作。</p>
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        <span class="icon">
+            <i class="fa-solid fa-tags fa-fw"></i>
+        </span>
+        
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/%E9%92%93%E9%B1%BC/" style="color: #ffa2c4">钓鱼</a>
+        </span>
+        
+    </div>
+    <a href="/articles/95fe95fd0904508210d706a9ece12e51/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
     <a href="/articles/1364f95af5002a73b7c21de43bc874f1/">
         <h2 class="post-title">Galaxy实现HTTP自动加解密</h2>
     </a>
@@ -157,7 +274,7 @@
         
         <span class="tag">
             
-            <a href="/tags/JS/" style="color: #ff7d73">JS</a>
+            <a href="/tags/JS/" style="color: #ffa2c4">JS</a>
         </span>
         
     </div>
@@ -196,7 +313,7 @@
         
         <span class="tag">
             
-            <a href="/tags/IOS/" style="color: #00a596">IOS</a>
+            <a href="/tags/IOS/" style="color: #ff7d73">IOS</a>
         </span>
         
     </div>
@@ -352,7 +469,7 @@
         
         <span class="tag">
             
-            <a href="/tags/Java/" style="color: #00a596">Java</a>
+            <a href="/tags/Java/" style="color: #ff7d73">Java</a>
         </span>
         
     </div>
@@ -391,128 +508,11 @@
         
         <span class="tag">
             
-            <a href="/tags/Java/" style="color: #ffa2c4">Java</a>
+            <a href="/tags/Java/" style="color: #ff7d73">Java</a>
         </span>
         
     </div>
     <a href="/articles/a1c9d8acb9bca455ea3e81afce68/" class="go-post">阅读全文</a>
-</div>
-
-<div class="post">
-    <a href="/articles/a1c9d8acb9bca455ea3e81afce80/">
-        <h2 class="post-title">初探缓冲区溢出</h2>
-    </a>
-    <div class="category-and-date">
-        
-        <span class="date">
-            <span class="icon">
-                <i class="fa-solid fa-calendar fa-fw"></i>
-            </span>
-            2024/8/25
-        </span>
-        
-        
-    </div>
-    <div class="description">
-        <div class="content" v-pre>
-            
-            <p>缓冲区溢出是指当计算机程序向缓冲区内填充的数据位数超过了缓冲区本身的容量，溢出的数据覆盖在合法数据上，我们使用精心设计的shellcode来覆盖合法的数据，从何使我们的shellcode得到执行。</p>
-            
-        </div>
-    </div>
-    <div class="post-tags">
-        
-        <span class="icon">
-            <i class="fa-solid fa-tags fa-fw"></i>
-        </span>
-        
-        
-        
-        <span class="tag">
-            
-            <a href="/tags/%E4%BA%8C%E8%BF%9B%E5%88%B6/" style="color: #00bcd4">二进制</a>
-        </span>
-        
-    </div>
-    <a href="/articles/a1c9d8acb9bca455ea3e81afce80/" class="go-post">阅读全文</a>
-</div>
-
-<div class="post">
-    <a href="/articles/a1c9d8acb9bca455ea3e81afce71/">
-        <h2 class="post-title">CrackMe-新手的突发奇想</h2>
-    </a>
-    <div class="category-and-date">
-        
-        <span class="date">
-            <span class="icon">
-                <i class="fa-solid fa-calendar fa-fw"></i>
-            </span>
-            2024/8/19
-        </span>
-        
-        
-    </div>
-    <div class="description">
-        <div class="content" v-pre>
-            
-            <p>Crackme是一种特别设计的小程序，其主要目的是测试程序设计人员的逆向工程技能。</p>
-            
-        </div>
-    </div>
-    <div class="post-tags">
-        
-        <span class="icon">
-            <i class="fa-solid fa-tags fa-fw"></i>
-        </span>
-        
-        
-        
-        <span class="tag">
-            
-            <a href="/tags/%E4%BA%8C%E8%BF%9B%E5%88%B6/" style="color: #ff7d73">二进制</a>
-        </span>
-        
-    </div>
-    <a href="/articles/a1c9d8acb9bca455ea3e81afce71/" class="go-post">阅读全文</a>
-</div>
-
-<div class="post">
-    <a href="/articles/a1c9d8acb9bca455ea3e81afce70/">
-        <h2 class="post-title">Android安全评估</h2>
-    </a>
-    <div class="category-and-date">
-        
-        <span class="date">
-            <span class="icon">
-                <i class="fa-solid fa-calendar fa-fw"></i>
-            </span>
-            2024/8/19
-        </span>
-        
-        
-    </div>
-    <div class="description">
-        <div class="content" v-pre>
-            
-            <p>Android安全评估指南</p>
-            
-        </div>
-    </div>
-    <div class="post-tags">
-        
-        <span class="icon">
-            <i class="fa-solid fa-tags fa-fw"></i>
-        </span>
-        
-        
-        
-        <span class="tag">
-            
-            <a href="/tags/%E6%B8%97%E9%80%8F/" style="color: #03a9f4">渗透</a>
-        </span>
-        
-    </div>
-    <a href="/articles/a1c9d8acb9bca455ea3e81afce70/" class="go-post">阅读全文</a>
 </div>
 
 
@@ -548,7 +548,7 @@
     <div id="footer-wrap">
         <div>
             &copy;
-            2022 - 2025 W000i
+            2022 - 2026 W000i
             <span id="footer-icon">
                 <i class="fa-solid fa-font-awesome fa-fw"></i>
             </span>
@@ -573,14 +573,7 @@
     </div>
     <script src="/js/main.js"></script>
     
-	
-	
-	{% if theme.fireworks %}
-   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
-   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
-   <script type="text/javascript" src="/js/lib/fireworks.js"></script>
-    {% endif %}
- 
+
 
         <style>
             [bg-lazy] {
